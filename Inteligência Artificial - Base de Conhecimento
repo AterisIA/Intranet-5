@@ -1,0 +1,72 @@
+[Nota: Intranet - Inteligência Artificial - Base de Conhecimento]
+
+[Nota: Onde]
+Na aba /base-conhecimento terá uma tabela interativa com as colunas: título, responsável, categoria e tags, todas ordenáveis. Acima da tabela, haverá uma área de filtros usando componentes padrão: o container TableFilters, contendo um campo de busca geral (TableSearchInput) e dois filtros seletivos: um para categoria (TableFilterSelect source="categoria") e outro para responsável (TableFilterSelect source="responsável"). Os filtros serão controlados pelos hooks useTableFilters e useFilterOptions.
+
+[Nota: Ordenação]
+
+A ordenação deve usar o estado sort de useTableFilters, com ícone de ordenação ao lado do título da coluna, alternando entre crescente e decrescente ao clicar e atualiza o estado.
+
+[Nota: Filtros]
+Acima da tabela, incluir um container TableFilters controlado pelos hooks useTableFilters e useFilterOptions; dentro dele, um TableSearchInput que faz busca geral em nome/descrição e filtra automaticamente enquanto o usuário digita, sem botão de aplicar; logo abaixo, renderizar os chips dos filtros ativos expostos por useTableFilters (por exemplo, “Técnico ×”, “Ana Costa ×”, intervalos de datas), cada chip removível individualmente; oferecer ação “Limpar tudo” integrada ao estado de useTableFilters; quaisquer filtros adicionais — como Data de Criação e Data de Atualização — devem ser registrados em useTableFilters e expostos no TableFilters por meio de date range pickers, refletindo nos chips, e toda aplicação ou remoção de filtro deve atualizar instantaneamente a listagem.
+[Nota: O que]
+Cada linha da tabela terá três botões visíveis: visualizar, editar e excluir. O título da coluna “Ações” deve ficar centralizado e alinhado visualmente entre os ícones de ação. Ao clicar em qualquer um desses botões, será aberto um pop-up reutilizável com três abas: Dados, Sistema e Mensagem.
+
+[Nota: Aba Dados] 
+Na aba Dados, o usuário preenche os campos título, conteúdo, categoria e tags (campo tags é opcional, restante é obrigatórios). O campo "responsável" é preenchido automaticamente com o usuário logado e não é exibido no formulário.
+
+[Nota: Aba sistema]
+Na aba Sistema que exibe uma timeline técnica dinâmica com histórico do registro em ordem cronológica (mais recentes primeiro) dentro de um ScrollArea de 400px de altura. Cada evento deve ter: coluna esquerda com ícone circular de 40x40px (w-10 h-10) sobre fundo azul semi-transparente (bg-primary/10) e ícone azul (text-primary) de 20px (w-5 h-5) do lucide-react, conectados por linha vertical cinza (bg-border) de 1px que para no último item; coluna direita com título do evento em negrito (font-semibold text-sm), linha de metadados com micro-ícone UserRound (w-3.5 h-3.5) + nome do usuário e micro-ícone CalendarClock + timestamp formatado em português "dd/MM/yyyy 'às' HH:mm" usando date-fns e locale ptBR, tudo em text-xs text-muted-foreground, separados por border-b exceto o último item. Mapeie os tipos de evento para ícones: "created" usa CirclePlus, "edited" usa PencilLine, "marked" usa Tag, "deleted" usa Trash2, "restored" usa RotateCcw, todos com a mesma cor azul (text-primary e bg-primary/10). A interface TimelineEvent deve ter id (string), type (union dos 5 tipos), user (string), timestamp (Date) e description (string). O componente Timeline recebe array de events, ordena por timestamp decrescente e renderiza cada TimelineItem passando a prop isLast para o último elemento controlar a linha vertical.
+
+[Nota: Aba Mensagens]
+Na aba Mensagem, crie um aba que funciona como um sistema de chat colaborativo moderno usando React, TypeScript, Tailwind CSS e componentes Shadcn/UI com as seguintes especificações:
+
+**ESTRUTURA DE COMPONENTES:**
+
+1. **Componente Principal (ChatColaborativo.tsx)**
+   - Gerencia estado de mensagens e participantes
+   - Props: recordTitle (título do registro), recordId (ID do registro)
+   - Estado inicial com 4 participantes mockados com avatares do DiceBear
+   - Mensagens iniciais demonstrando funcionalidades de menção
+   - Layout: Container flex vertical sem scroll, distribuindo espaço entre título fixo, área de mensagens com scroll, e input fixo
+
+2. **Lista de Mensagens (MessageList.tsx)**
+   - ScrollArea com padding adequado aplicado na lista de mensagens (o popup em si deve ser fixo)
+   - Mensagens alinhadas à esquerda (outros) e direita (usuário atual)
+   - Cada mensagem contém:
+     * Avatar circular (40x40px)
+     * Nome do autor em negrito
+     * Timestamp formatado em português (Hoje às HH:mm, Ontem às HH:mm, ou DD/MM/YYYY às HH:mm)
+     * Bolha de mensagem com bordas arredondadas
+     * Conteúdo com suporte a menções destacadas
+   - Mensagens do usuário: fundo azul vibrante, texto branco
+   - Mensagens de outros: fundo cinza claro (muted), texto escuro
+   - Menções (@nome) destacadas com fundo semi-transparente da cor primary
+
+3. **Input de Mensagens (MessageInput.tsx)**
+   - Textarea expansível com altura mínima de 80px
+   - Placeholder: "Digite sua mensagem... Use @ para mencionar alguém"
+   - Botão de envio azul com ícone Send do Lucide
+   - Sistema de menções com @:
+     * Detecta @ digitado e abre popover de sugestões acima do input
+     * Filtra participantes conforme texto digitado após @
+     * Popover mostra avatar, nome e cargo
+     * Ao clicar, insere menção completa no texto
+     * Fecha automaticamente após seleção
+   - Hint: "Pressione Enter para enviar, Shift+Enter para nova linha"
+   - Validação de menções ao enviar (apenas usuários válidos)
+
+**DESIGN SYSTEM (CSS Variables):**
+
+```css
+--primary: 217 83% 58%; /* Azul vibrante para mensagens enviadas */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;  /* Cinza claro para mensagens recebidas */
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+[Nota: Criar item]
+O botão “Criar novo item” também abre esse pop-up, mas em branco. O botão “Salvar” só será ativado quando todos os campos obrigatórios, especialmente o de conteúdo, forem preenchidos. Após o salvamento, o novo item será adicionado automaticamente à tabela.
+
+[Nota: Final]
