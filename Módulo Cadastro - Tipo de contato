@@ -8,7 +8,6 @@ Apresentar a tabela de listagem dos tipos de contato com as colunas “Tipo de C
 A listagem deve reagir a changes em filters, search e sort providos por useTableFilters e atualizar automaticamente após criar, editar ou excluir; utilizar consistentemente componentes shadcn/ui, integrar os date range pickers de criação/atualização ao useTableFilters, exibir toasts e loaders para criar, editar, excluir e enviar mensagem e garantir acessibilidade com foco de teclado e aria-labels nos controles e ícones de ação.A página deve exibir um botão “Novo Tipo de Contato”.
 
 [Nota: Ordenação]
-
 A ordenação deve usar o estado sort de useTableFilters, com ícone de ordenação ao lado do título da coluna, alternando entre crescente e decrescente ao clicar e atualiza o estado.
 
 [Nota: Filtros]
