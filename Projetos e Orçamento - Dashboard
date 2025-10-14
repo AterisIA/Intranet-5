@@ -1,0 +1,142 @@
+[Nota: Intranet - Projetos e Orçamento - Dashboards]
+
+[Nota: Onde]
+Na página **/dashboard**. A tela é composta por:
+
+1. **Faixa de Filtros Globais** (card no topo).
+2. **KPIs principais** (cards responsivos, 2–4 por linha).
+3. **Gráficos analíticos** (linha 1: evolução temporal; linha 2: distribuição/benchmark).
+4. **Tabela unificada** de registros (projetos com seus orçamentos agregados) com drill-down.
+5. **Atividade recente** (timeline técnica).
+
+[Nota: Filtros]
+Usar **TableFilters** com estado e sincronização via **useTableFilters** e **useFilterOptions**. Conteúdos:
+
+* **TableSearchInput** (busca geral por nome/descrição de projeto/orçamento; aplica em tempo real).
+* **DateRangePicker** obrigatório (período de análise) com presets: *Este mês*, *Últimos 30 dias*, *Últimos 90 dias*, *Ano atual*, *Personalizado*.
+* **Selects** (multi ou single, conforme configuração do hook):
+
+  * **Cliente**, **Empresa**, **Fornecedor**, **Local**
+  * **Status do Projeto** (ex.: *ativo*, *pausado*, *encerrado*)
+  * **Status do Orçamento** (*pendente*, *aprovado*, *reprovado*)
+* **Chips de filtros ativos** vindos do **useTableFilters** (removíveis individualmente).
+* Ações: **“Limpar tudo”** (reset dos filtros) e **“Salvar visão”** (salva conjunto de filtros/sort como visão rápida).
+  Qualquer mudança nos filtros atualiza **imediatamente** KPIs, gráficos e tabela.
+
+[Nota: KPIs (Cards)]
+Quatro a oito cards, todos reativos aos filtros/ período, com ícone do **lucide-react**, valor principal, variação vs período anterior e mini-sparkline (Recharts) opcional:
+
+* **Projetos no período** (count) + variação %.
+* **Orçamentos criados** (count) e **Aprovados** (count).
+* **Taxa de Aprovação** (aprovados / total orçamentos do período).
+* **Valor Aprovado (R$)** (soma de orçamentos aprovados) + variação %.
+* **Ticket Médio (R$)** (valor aprovado / nº orçamentos aprovados).
+* **Projetos com Prazo Próximo (≤7 dias)** (count).
+* **Orçamentos Pendentes** (count) e **Overdue** (prazo < hoje).
+  Cada card tem um **toggle “Qtd / Valor”** quando fizer sentido (ex.: mostrar número de orçamentos ou seu valor total). Clique em um card **aplica um filtro contextual** na página.
+
+[Nota: Gráficos – Linha 1 (Evolução no Tempo)]
+Colocar um **ChartCard** com tabs internas (**Contagem** | **Valor (R$)**) e **toggle “Diário / Semanal / Mensal”**:
+
+* **Área/Line Chart** (Recharts) “Evolução de Projetos & Orçamentos”:
+
+  * Série 1: Projetos criados no período (quantidade)
+  * Série 2: Orçamentos criados (quantidade)
+  * Série 3 (opcional): Orçamentos **aprovados** (quantidade)
+  * Alternativa em **Valor (R$)**: somatórios por data.
+* **Acumulado (Cumulativo)**: checkbox “Exibir acumulado” converte as séries para curvas cumulativas.
+* **Brush/Zoom** para intervalo customizado dentro do período selecionado.
+  Tooltips pt-BR, eixos com formatação de data/ moeda, legenda clicável para isolar séries.
+
+[Nota: Gráficos – Linha 2 (Distribuição & Benchmark)]
+Três gráficos lado a lado (colapsam responsivamente):
+
+1. **Donut/Polar** “Status dos Orçamentos” (pendente/aprovado/reprovado) com opção **Qtd/Valor**.
+2. **Bar Stacked** “Valor por Cliente (Top 10)” – barras empilhadas (*aprovado* vs *pendente*).
+3. **Horizontal Bar** “Projetos por Empresa/Local” – seletor de dimensão (**Empresa | Local | Fornecedor**).
+   Todos reagem aos filtros globais e permitem **clicar em legendas/segmentos** para aplicar filtros adicionais.
+
+[Nota: Tabela Unificada]
+Seção **“Visão Unificada”** (paginação, ordenação com ícones, sticky header). Colunas (todas ordenáveis, exceto Ações):
+
+* **Projeto** (nome com link para detalhe)
+* **Cliente**
+* **Empresa**
+* **Prazo do Projeto**
+* **Orçamentos (Qtd)**
+* **Valor Total Orçamentos (R$)**
+* **Aprovados (Qtd / R$)**
+* **Taxa de Aprovação (%)**
+* **Status Predominante** (badge calculada pelo maior volume em valor; se empate, exibir *misto*)
+* **Data de Criação (Projeto)**
+* **Ações** (ver projeto, ver orçamentos do projeto, editar, excluir) – título **centralizado**.
+  **Row Expandable (drill-down):** ao expandir a linha, renderizar uma **subtabela** com os orçamentos daquele projeto: **Nome do Orçamento**, **Status**, **Prazo**, **Valor (R$)**, **Data de Criação**, **Ações** (visualizar/editar/excluir).
+  **Cálculos**:
+* *Valor Total Orçamentos*: soma de todos os orçamentos do projeto dentro do período/filtros.
+* *Aprovados (Qtd / R$)*: contagem e soma dos aprovados.
+* *Taxa de Aprovação (%)* = aprovados / total do projeto no período.
+  A tabela respeita **useTableFilters.sort** e exibe **chips** dos filtros ativos logo acima.
+
+[Nota: Atividade Recente (Timeline)]
+Card lateral ou abaixo da tabela com **ScrollArea h-[400px]** listando eventos mais recentes (criação/edição/aprovação/reprovação/exclusão/restauração) em ordem **decrescente** de tempo.
+**Ícones** (lucide-react) e estilos iguais às telas anteriores:
+
+* `"created"`→`CirclePlus`, `"edited"`→`PencilLine`, `"marked"`→`Tag`, `"deleted"`→`Trash2`, `"restored"`→`RotateCcw` (todos `text-primary` em `bg-primary/10`).
+  **Metadados**: `UserRound` + usuário, `CalendarClock` + `"dd/MM/yyyy 'às' HH:mm"` (date-fns `ptBR`).
+  Interface `TimelineEvent`: `{ id: string; type: 'created'|'edited'|'marked'|'deleted'|'restored'; user: string; timestamp: Date; description: string }`.
+
+[Nota: Interações & Utilitários]
+
+* **Cross-filtering**: clique em pontos/segmentos/barras aplica filtro (ex.: cliente, status, mês).
+* **Agrupamentos**: seletor “**Agrupar por**: *Cliente | Empresa | Fornecedor | Local | Status*” que reconfigura o gráfico “Valor por …” e a tabela (agrega nível do grupo).
+* **Exportar**: botão **“Exportar CSV/Excel”** (dados atuais filtrados) e **“Exportar PNG”** dos gráficos.
+* **Salvar visão**: guarda filtros + layout do gráfico (tabs/agrupamento) como atalho do usuário.
+* **Badges de Status**:
+
+  * Projeto: *ativo* (azul), *pausado* (âmbar), *encerrado* (cinza).
+  * Orçamento: *pendente* (amarelo), *aprovado* (verde), *reprovado* (vermelho).
+* **Tooltips de contexto** nos KPIs e rótulos dos gráficos.
+* **Empty/Loading/Error states** padronizados (skeletons, mensagens curtas e ações de retry).
+
+[Nota: Aba de Ações (Pop-ups Reutilizáveis)]
+Os botões **“+ Novo Projeto”** e **“+ Novo Orçamento”** abrem o **mesmo pop-up de três abas** já padronizado (**Dados**, **Sistema**, **Mensagem**).
+
+* **Dados (Projeto)**: nome (obrig.), cliente (obrig.), empresa/fornecedor/local (opcional), prazo (opcional), valor máximo (opcional), descrição, tags, anexos.
+* **Dados (Orçamento)**: nome (obrig.), projeto (obrig.), cliente (obrig.), empresa/fornecedor/local (opcional), **prazo (obrig.)**, **status (obrig.)**, descrição, tags, anexos.
+* **Sistema**: timeline técnica (como acima).
+* **Mensagem**: chat colaborativo (menções @, textarea expansível, Send, validação).
+  **Salvar** só habilita quando os **obrigatórios** estiverem válidos; ao salvar, atualizar KPIs/gráficos/tabela em tempo real.
+
+[Nota: Design System]
+Usar **Shadcn/UI**, **Tailwind**, **lucide-react**, **Recharts** (gráficos), **date-fns/ptBR** para formato de datas.
+Tokens (CSS vars) mantidos:
+
+```css
+--primary: 217 83% 58%;
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+```
+
+Grids responsivos, cards com `rounded-2xl` e sombras suaves; tabela com `text-sm`, gráficos em **cards** com header (título + controles).
+
+[Nota: Dados & Cálculos (pseudocampos)]
+
+* **Projeto.totalOrcamentos(periodo, filtros)**
+* **Projeto.valorTotal(periodo, filtros)** = Σ orçamento.valor
+* **Projeto.valorAprovado(periodo, filtros)** = Σ orçamento.valor(status=aprovado)
+* **Projeto.taxaAprovacao** = valor **ou** contagem (conforme toggle)
+* **Globais** seguem mesma lógica respeitando o **DateRange** e **filtros ativos**.
+* Quando **toggle “Qtd/Valor”** estiver em **Valor**, todos os percentuais e rankings devem usar **soma em R$** em vez de contagens.
+
+[Nota: Acessibilidade]
+
+* Labels e `aria-*` em inputs, gráficos com `aria-label` e descrição.
+* Ícones de ação com `aria-label` (“Visualizar projeto”, “Editar orçamento”).
+* Navegação por teclado, foco visível e contraste AA.
+* Tabelas com `scope="col"` nos th e `sr-only` para textos auxiliares.
+
+[Nota: Final]
+A dashboard deve **replicar a linguagem visual** das suas telas, centralizando **insights acionáveis**: KPIs com variações, evolução temporal com opção de **acumulado**, distribuições por **status/cliente/empresa**, **tabela unificada** com drill-down e **atividade recente** — tudo **controlado por filtros globais de período e contexto**, com **cross-filtering** e **exportação**.
