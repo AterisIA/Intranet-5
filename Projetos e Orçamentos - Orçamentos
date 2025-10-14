@@ -1,0 +1,193 @@
+[Nota: Intranet - Projetos e Orçamentos - Orçamentos]
+
+[Nota: Onde]
+Na aba /orcamentos haverá uma tabela interativa com as colunas: nome, projeto, cliente, empresa, prazo, status, data de criação e ações — todas (exceto Ações) ordenáveis.
+Acima da tabela, haverá um bloco de filtros usando os componentes padrões: TableFilters contendo:
+
+um campo de busca geral (TableSearchInput) que busca por nome/descrição e aplica em tempo real;
+
+seis filtros seletivos:
+
+Projeto (TableFilterSelect source="projeto"),
+
+Cliente (TableFilterSelect source="cliente"),
+
+Empresa (TableFilterSelect source="empresa"),
+
+Fornecedor (TableFilterSelect source="fornecedor"),
+
+Local (TableFilterSelect source="local"),
+
+Status (TableFilterSelect source="status" com opções pendente, aprovado, reprovado).
+Os filtros serão controlados por useTableFilters e useFilterOptions.
+
+No header da página, à direita do título Orçamentos, exibir o botão primário “+ Novo Orçamento” que abre o pop-up de criação/edição (mesmo componente do ver/editar).
+
+[Nota: Ordenação]
+A ordenação usa o estado sort de useTableFilters, com ícone de ordenação ao lado do título da coluna. Ao clicar, alterna entre crescente/decrescente e atualiza o estado. Colunas ordenáveis: nome, projeto, cliente, empresa, prazo, status, data de criação.
+
+[Nota: Filtros]
+Acima da tabela:
+
+TableFilters (controlado por useTableFilters e useFilterOptions).
+
+TableSearchInput com busca instantânea (sem botão Aplicar).
+
+Chips dos filtros ativos expostos por useTableFilters (ex.: “Projeto: Torre A ×”, “Status: pendente ×”, “Cliente: Cury ×”). Cada chip é removível.
+
+Ação “Limpar tudo” integrada ao estado de useTableFilters.
+
+Filtros adicionais opcionais: Data de Criação e Prazo (range pickers) registrados em useTableFilters, refletidos nos chips e aplicados/remoções em tempo real.
+
+A listagem deve reagir imediatamente a qualquer alteração de filtro, busca, ou ordenação.
+
+Acima de cada um dos filtros deve haver um indicador de qual coluna ele esta se referindo
+
+[Nota: Tabela]
+Título da seção: “Orçamentos Cadastrados”.
+Colunas:
+
+Nome (texto)
+
+Projeto (texto)
+
+Cliente (texto)
+
+Empresa (texto ou “–”)
+
+Prazo (data dd/MM/yyyy)
+
+Status (badge)
+
+pendente → badge amarelo (ex.: bg-yellow-100 text-yellow-700)
+
+aprovado → badge verde (ex.: bg-green-100 text-green-700)
+
+reprovado → badge vermelho (ex.: bg-red-100 text-red-700)
+
+Data de Criação (data dd/MM/yyyy)
+
+Ações (ícones visualizar, editar; opcional excluir)
+O título da coluna Ações deve ficar centralizado e alinhado visualmente aos ícones.
+Paginação padrão (client ou server) e estado “vazio” com mensagem amigável + ação “Criar novo orçamento”.
+
+[Nota: Ações / Pop-up reutilizável]
+Os botões visualizar, editar e excluir ficam sempre visíveis na linha.
+Ao clicar em visualizar ou editar, abrir um pop-up reutilizável com três abas: Dados, Sistema e Mensagem (mesmo componente para criar/editar/visualizar; modo visualização com campos read-only e ações desabilitadas).
+
+[Nota: Aba Dados]
+Campos do formulário:
+
+Nome (obrigatório)
+
+Projeto (obrigatório; select)
+
+Cliente (obrigatório; select)
+
+Empresa (opcional; select)
+
+Fornecedor (opcional; select)
+
+Local (opcional; select)
+
+Prazo (obrigatório; date picker)
+
+Status (obrigatório; select com pendente, aprovado, reprovado)
+
+Descrição (opcional; textarea)
+
+Tags (opcional; multi-select)
+
+Anexos (opcional; uploader, múltiplos)
+O campo responsável é preenchido automaticamente com o usuário logado e não é exibido no formulário.
+Validação: o botão Salvar só habilita quando todos os obrigatórios estiverem válidos (especialmente Nome, Projeto, Cliente, Prazo, Status).
+Após salvar, fechar o pop-up, inserir/atualizar o item na tabela e resetar o estado do formulário.
+
+[Nota: Aba Sistema (Timeline Técnica)]
+Exibir uma timeline dinâmica (mais recentes primeiro) dentro de ScrollArea h-[400px].
+Cada evento contém:
+
+Coluna esquerda: ícone circular 40x40 (w-10 h-10) com bg-primary/10 e ícone lucide-react 20px (w-5 h-5) em text-primary, conectados por linha vertical bg-border 1px que para no último item.
+
+Coluna direita:
+
+título do evento (font-semibold text-sm)
+
+metadados em text-xs text-muted-foreground com micro-ícones UserRound (usuário) e CalendarClock (data), separados por border-b exceto no último.
+
+timestamp formatado pt-BR: "dd/MM/yyyy 'às' HH:mm" com date-fns/ptBR.
+Mapeamento de ícones:
+
+"created" → CirclePlus
+
+"edited" → PencilLine
+
+"marked" → Tag
+
+"deleted" → Trash2
+
+"restored" → RotateCcw
+Todos com text-primary e bg-primary/10.
+Interface TimelineEvent: { id: string; type: 'created'|'edited'|'marked'|'deleted'|'restored'; user: string; timestamp: Date; description: string }.
+O componente Timeline recebe events, ordena por timestamp desc e passa isLast ao último item para controlar a linha.
+
+[Nota: Aba Mensagens]
+Na aba Mensagem, crie um aba que funciona como um sistema de chat colaborativo moderno usando React, TypeScript, Tailwind CSS e componentes Shadcn/UI com as seguintes especificações:
+
+**ESTRUTURA DE COMPONENTES:**
+
+1. **Componente Principal (ChatColaborativo.tsx)**
+   - Gerencia estado de mensagens e participantes
+   - Props: recordTitle (título do registro), recordId (ID do registro)
+   - Estado inicial com 4 participantes mockados com avatares do DiceBear
+   - Mensagens iniciais demonstrando funcionalidades de menção
+   - Layout: Container flex vertical sem scroll, distribuindo espaço entre título fixo, área de mensagens com scroll, e input fixo
+
+2. **Lista de Mensagens (MessageList.tsx)**
+   - ScrollArea com padding adequado aplicado na lista de mensagens (o popup em si deve ser fixo)
+   - Mensagens alinhadas à esquerda (outros) e direita (usuário atual)
+   - Cada mensagem contém:
+     * Avatar circular (40x40px)
+     * Nome do autor em negrito
+     * Timestamp formatado em português (Hoje às HH:mm, Ontem às HH:mm, ou DD/MM/YYYY às HH:mm)
+     * Bolha de mensagem com bordas arredondadas
+     * Conteúdo com suporte a menções destacadas
+   - Mensagens do usuário: fundo azul vibrante, texto branco
+   - Mensagens de outros: fundo cinza claro (muted), texto escuro
+   - Menções (@nome) destacadas com fundo semi-transparente da cor primary
+
+3. **Input de Mensagens (MessageInput.tsx)**
+   - Textarea expansível com altura mínima de 80px
+   - Placeholder: "Digite sua mensagem... Use @ para mencionar alguém"
+   - Botão de envio azul com ícone Send do Lucide
+   - Sistema de menções com @:
+     * Detecta @ digitado e abre popover de sugestões acima do input
+     * Filtra participantes conforme texto digitado após @
+     * Popover mostra avatar, nome e cargo
+     * Ao clicar, insere menção completa no texto
+     * Fecha automaticamente após seleção
+   - Hint: "Pressione Enter para enviar, Shift+Enter para nova linha"
+   - Validação de menções ao enviar (apenas usuários válidos)
+
+**DESIGN SYSTEM (CSS Variables):**
+
+```css
+--primary: 217 83% 58%; /* Azul vibrante para mensagens enviadas */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;  /* Cinza claro para mensagens recebidas */
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+[Nota: Criar item]
+O botão “+ Novo Orçamento” abre o mesmo pop-up com campos em branco. Após salvar com sucesso, adicionar automaticamente o novo item na tabela (no topo se ordenação por data desc) e exibir toaster de sucesso.
+
+[Nota: Estados & Acessibilidade]
+
+Estados de carregando, vazio e erro padronizados (skeletons, mensagens curtas).
+
+Todos os controles com labels, aria-attributes e atalhos (Enter/Shift+Enter no chat).
+
+Ícones com aria-label nos botões de ação (Ex.: “Visualizar orçamento”).
+
+[Nota: Final]
