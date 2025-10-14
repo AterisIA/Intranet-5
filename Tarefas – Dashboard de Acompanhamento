@@ -1,0 +1,76 @@
+[Nota: Intranet – Projetos e Tarefas – Dashboard de Acompanhamento]
+
+[Nota: Onde]
+Na página /tarefas/dashboard, o layout é composto por:
+
+1. Faixa de Filtros Globais (fixa no topo).
+2. KPIs principais (cards dinâmicos, 2–3 por linha).
+3. Gráficos analíticos (linha 1: progresso temporal; linha 2: distribuição por status e prioridade).
+4. Tabela de tarefas cadastradas (como na tela atual, com ordenação e ações).
+5. Atividade recente / Timeline técnica.
+
+[Nota: Filtros]
+Usar TableFilters com estado sincronizado via useTableFilters. Campos:
+
+* Busca global (por título, descrição ou projeto).
+* Selects: Projeto, Status, Prioridade, Responsável, Prazo.
+* Botões de ação: “Limpar tudo” e “Salvar visão”.
+* Atualizações reativas: qualquer mudança reflete imediatamente nos KPIs e gráficos.
+
+[Nota: KPIs Principais]
+Exibir 4 a 6 cards principais (todos reativos aos filtros), com ícone do lucide-react, valor atual e variação vs período anterior:
+
+* Total de Tarefas (count).
+* Em Andamento, Concluídas e Pendentes (count).
+* Taxa de Conclusão (%) = concluidas / total.
+* Tarefas Atrasadas (Overdue) (prazo < hoje).
+* Média de Dias até Conclusão (base nas concluídas).
+* (opcional) Distribuição por Prioridade: Alta / Média / Baixa / Urgente (mini-chart dentro do card).
+  Cada card é clicável e aplica um filtro contextual na tabela.
+
+[Nota: Gráficos]
+Linha 1 – Evolução Temporal:
+Gráfico de linha/área (Recharts) com tabs internas Contagem | Percentual, e toggle “Diário / Semanal / Mensal”.
+
+* Série 1: Tarefas criadas.
+* Série 2: Tarefas concluídas.
+* Série 3 (opcional): Tarefas atrasadas.
+  Checkbox “Exibir acumulado” converte para curva cumulativa.
+
+Linha 2 – Distribuição e Benchmark:
+Três gráficos responsivos:
+
+1. Donut Chart – Status das Tarefas (pendente, em andamento, concluída).
+2. Bar Chart – Prioridade das Tarefas (alta, média, baixa, urgente).
+3. Horizontal Bar – Responsável com mais tarefas (Top 10).
+   Todos aplicam cross-filter ao serem clicados.
+
+[Nota: Tabela de Tarefas]
+Tabela idêntica à tela atual, com ordenação por colunas e filtros ativos exibidos acima.
+Colunas principais: Projeto | Descrição | Orçamento | Título | Responsável | Status | Prazo | Prioridade | Ações
+Ações: visualizar, editar, excluir.
+Badges de status e prioridade com as cores padronizadas (azul, amarelo, verde, vermelho).
+KPIs e gráficos devem refletir sempre os mesmos filtros da tabela.
+
+[Nota: Timeline de Atividades]
+Card lateral ou abaixo da tabela com eventos recentes:
+
+* Ícones: CirclePlus, PencilLine, Trash2, RotateCcw.
+* Mostra: usuário, tipo de ação, data/hora e descrição.
+* Ordenação decrescente (mais recentes primeiro).
+
+[Nota: Interações e Utilitários]
+
+* Cross-filtering entre cards, gráficos e tabela.
+* Exportar CSV/Excel com tarefas filtradas.
+* Empty/Loading/Error states padronizados.
+* Acessibilidade total (labels, aria-* e navegação por teclado).
+* Design System: Shadcn/UI + Tailwind + lucide-react + Recharts.
+
+[Nota: Métricas de Valor e Cálculos]
+Total de Tarefas = count(*) conforme filtros
+Tarefas Concluídas = count(status = concluída)
+Taxa de Conclusão = concluidas / total (em %)
+Tarefas Atrasadas = count(prazo < hoje e status ≠ concluída)
+Tempo Médio de Conclusão = média(data_conclusão - data_criação) em dias
+Tarefas por Responsável = group by responsável (ranking Top 10)
