@@ -1,0 +1,185 @@
+[Nota: Intranet - Inteligência Artificial - Agente Ariana]
+
+[Nota: Onde]
+Crie uma aplicação na tela /agente-ariana usando React standalone de chat com IA chamada "Agente Ariana" usando TypeScript, Tailwind CSS e Shadcn/UI. A aplicação deve funcionar de forma completamente independente, sem necessidade de autenticação externa ou infraestrutura complexa.
+
+[Nota: Requisitos Técnicos Fundamentais]
+Use React 18 com TypeScript. Instale e configure Tailwind CSS e os seguintes componentes do Shadcn/UI: Button, Input, Card, CardContent, CardHeader, CardTitle, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Label, Textarea, ScrollArea, Separator, Toast e Toaster. Instale também lucide-react para ícones.
+
+[Nota: Estrutura de Layout Principal]
+A interface ocupa toda a altura da viewport (h-screen) e usa um layout flex horizontal com duas colunas principais.
+A primeira coluna (sidebar esquerda) tem largura fixa de 320px (w-80), borda direita, fundo bg-card e layout flex vertical.
+A segunda coluna (área do chat) ocupa o espaço restante (flex-1) e também usa layout flex vertical.
+
+[Nota: Coluna da Esquerda - Sidebar]
+No topo da sidebar, crie um container com padding de 8px (p-2) e borda inferior.
+Dentro dele:
+
+Botão "Novo chat" (w-full, mb-3, bg-primary hover:bg-primary/90, ícone MessageCircle à esquerda).
+
+Campo de busca com ícone Search posicionado absolutely (left-3 top-3), placeholder "Buscar em chats...", padding-left (pl-10).
+
+Seção “Projetos” com padding de 8px (p-2) e borda inferior.
+Cabeçalho flex justify-between com título “Projetos” (font-semibold text-sm) e botão ghost com ícone Plus.
+O botão Plus abre um Dialog modal “Novo Projeto” com Input “Nome do Projeto” e Textarea “Descrição” (opcional), seguido de botão “Criar Projeto” (w-full).
+
+Lista (space-y-2) abaixo do cabeçalho exibindo cada projeto como linha flex com ícone FolderOpen (h-4 w-4 text-muted-foreground) e nome clicável (cursor-pointer hover:text-primary).
+Ao clicar em um projeto, cria uma nova conversa associada.
+
+Seção “Conversas Recentes” dentro de ScrollArea (flex-1) com padding (p-2), título “Conversas Recentes” (font-semibold text-sm mb-2) e lista de cards de conversa (space-y-2).
+
+[Nota: Cards de Conversa]
+Cada conversa é um Card com classe group, transição de cores e background condicional:
+
+bg-primary/10 quando selecionada
+
+hover:bg-muted quando não selecionada
+CardContent com padding p-3.
+
+Modo não editável: container clicável (cursor-pointer) que carrega as mensagens e define como conversa atual.
+Dentro: título (text-sm font-medium flex-1) e botão Edit (opacity-0 group-hover:opacity-100 h-6 w-6 p-0 ícone Edit h-3 w-3).
+Abaixo do título: se houver projeto, exibir “📁 [nome do projeto]” (text-xs text-muted-foreground mt-1).
+Última linha: data formatada (text-xs text-muted-foreground mt-1).
+
+Modo editável: flex items-center space-x-2 com Input (flex-1 h-8 text-sm autoFocus) e botões ghost pequenos com ícones Check e X.
+Input responde a Enter (confirmar) e Escape (cancelar).
+
+Após a lista, se houver mais de 2 conversas e todas não exibidas, mostrar botão ghost (w-full justify-center text-sm) com ícone ChevronDown e texto “Conversas anteriores”.
+Se expandido, mostrar botão com ícone ChevronUp e texto “Mostrar menos”.
+
+[Nota: Coluna da Direita - Área do Chat]
+A coluna (flex-1 flex flex-col) tem dois estados:
+
+Sem conversa selecionada
+
+Com conversa selecionada
+
+[Nota: Estado - Sem Conversa Selecionada]
+Tela centralizada (flex-1 flex items-center justify-center) com:
+
+Imagem circular (96x96px, w-24 h-24 mx-auto rounded-full object-cover mb-4)
+
+Título “Agente Ariana” (text-2xl font-semibold mb-2)
+
+Texto “Selecione uma conversa ou inicie um novo chat” (text-muted-foreground mb-4)
+
+Botão com ícone Plus e texto “Novo Chat” que cria nova conversa.
+
+[Nota: Estado - Com Conversa Selecionada]
+Três seções verticais:
+
+HEADER FIXO: p-4 border-b bg-card
+
+Flex items-center space-x-3
+
+Imagem Ariana (w-12 h-12 rounded-full object-cover)
+
+Nome “Agente Ariana” (text-xl font-semibold)
+
+Saudação “Que bom te ver, [nome do usuário]” (text-sm text-muted-foreground)
+
+ÁREA DE MENSAGENS: ScrollArea (flex-1 p-4)
+
+Container (space-y-4 max-w-4xl mx-auto)
+
+Mensagens: flex justify-end (usuário) ou justify-start (IA)
+
+Balão: max-w-xs lg:max-w-md, px-4 py-2, rounded-lg
+
+Cores: bg-primary text-primary-foreground (usuário) / bg-muted (IA)
+
+Texto (text-sm) e horário (text-xs opacity-70 mt-1) formatado HH:MM:SS
+
+Div final com ref para scroll automático
+
+INPUT ÁREA: p-4 border-t bg-card
+
+Flex items-end space-x-2 max-w-4xl mx-auto
+
+Se houver áudio: div flex-1 p-2 bg-muted rounded-lg “Áudio gravado - pronto para enviar” (text-sm)
+
+Se não houver: Input flex-1 placeholder “Pergunte alguma coisa...” envia ao Enter
+
+Botão gravação: variant condicional (destructive se gravando, outline se não), ícone Mic/MicOff
+
+Botão enviar: ícone Send, desabilitado se sem texto/áudio
+
+[Nota: Lógica de Estado e Funcionalidades]
+Interfaces:
+
+Project { id, name, description?, created_at }
+
+Conversation { id, title, project_id?, created_at, updated_at }
+
+Message { id, message, message_type, role, created_at, audio_url? }
+
+Estados com useState: projects, conversations, messages, currentConversation, searchTerm, inputMessage, isRecording, audioBlob, newProjectName, newProjectDescription, isNewProjectOpen, showAllConversations, editingConversationId, editingConversationTitle.
+Refs: mediaRecorderRef, audioChunksRef, messagesEndRef.
+
+[Nota: Implementação das Funções Principais]
+CRIAR PROJETO: createProject adiciona novo projeto ao array projects, gera id, limpa campos, fecha modal, mostra toast sucesso.
+CRIAR CONVERSA: createConversation cria nova conversa, define currentConversation, limpa messages, mostra toast sucesso.
+CARREGAR MENSAGENS: loadMessages filtra messages por conversationId e ordena por created_at.
+ENVIAR MENSAGEM: sendMessage cria mensagem user, adiciona, simula resposta IA após 1-2s, limpa input/audio.
+GRAVAÇÃO DE ÁUDIO: startRecording (permite microfone, inicia MediaRecorder, define isRecording true), stopRecording (gera Blob, encerra tracks, define isRecording false).
+EDITAR TÍTULO: updateConversationTitle atualiza título, limpa estados, mostra toast sucesso. startEditingConversation e cancelEditingConversation controlam edição.
+FILTRAGEM: filteredConversations filtra por searchTerm; displayedConversations mostra 2 ou todas; hasMoreConversations detecta overflow.
+UTILIDADES: getProjectName retorna nome do projeto; scrollToBottom faz scroll automático.
+
+[Nota: Efeitos Colaterais]
+useEffect com scroll automático sempre que messages mudar.
+
+[Nota: Dados Mock Iniciais]
+projects: 2-3 exemplos (“Desenvolvimento Web”, “Marketing Digital”).
+conversations: 2-3 exemplos (“Dúvidas sobre React”, “Planejamento de Sprint”, “Análise de Métricas”).
+messages: vazio inicialmente.
+
+[Nota: Sistema de Toast]
+Configure Toast do Shadcn/UI para notificações de sucesso e erro.
+Posicione o Toaster no layout principal.
+
+[Nota: Responsividade e Acessibilidade]
+max-w-xs em mobile, max-w-md em desktop.
+Todos os botões com aria-labels.
+Campo de edição autoFocus e responde a Enter/Escape.
+
+[Nota: Paleta de Cores e Design System]
+Use variáveis CSS do Shadcn/UI:
+
+bg-background (fundo principal)
+
+bg-card (cards/sidebar)
+
+bg-primary (mensagens do usuário/botões principais)
+
+text-primary-foreground (texto em primary)
+
+bg-muted (mensagens IA)
+
+text-muted-foreground (textos secundários)
+
+border (bordas)
+Cantos rounded-lg/full e espaçamentos Tailwind (2, 3, 4, 8, 12, 16px).
+
+[Nota: Ícones Lucide]
+MessageCircle, Search, Plus, Mic, MicOff, Send, FolderOpen, Edit, Check, X, ChevronDown, ChevronUp.
+
+[Nota: Comportamentos Interativos Específicos]
+Clique em projeto cria conversa associada.
+Clique em conversa carrega e define atual.
+Botão Edit aparece apenas no hover da conversa selecionada.
+Edição inline: Enter confirma, Escape cancela.
+Botão enviar desabilitado se sem texto/áudio.
+Botão gravação alterna Mic/MicOff.
+Lista mostra 2 conversas iniciais com botão expandir.
+
+[Nota: Estrutura de Arquivos Recomendada]
+Arquivo principal App.tsx contendo todo o componente Ariana.
+Configure tailwind.config.ts com cores do Shadcn/UI.
+Componentes Shadcn/UI em src/components/ui/.
+Sem roteamento ou autenticação externa.
+
+[Nota: Simulação de Backend]
+Todas as operações ocorrem em memória com estados React.
+Mensagens IA simuladas com respostas predefinidas após delay.
+Sem persistência real de dados.
