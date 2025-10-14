@@ -1,0 +1,191 @@
+Recrie:
+
+Nota: Intranet - Módulo Cadastro - Locais]
+
+[Nota: Onde]
+Dentro do item de menu chamado “Cadastro”, crie um subitem chamado “Locais”. Ao clicar em “Locais”, abrir uma página chamada “Locais”, seguindo o padrão visual dos demais módulos utilizando shadcn/ui.
+
+[Nota: O que]
+Apresentar a tabela de listagem dos locais com as colunas “Nome”, “Cliente”, “Empresa”, “Tipo”, “Cidade/Estado” e “Ações”, todas ordenáveis; o título da coluna “Ações” deve ficar centralizado e alinhado visualmente entre os ícones e, na própria coluna, exibir diretamente os ícones de Visualizar, Editar e Excluir (sem menu de três pontos).
+A listagem deve reagir a changes em filters, search e sort providos por useTableFilters e atualizar automaticamente após criar, editar ou excluir; utilizar consistentemente componentes shadcn/ui, integrar os date range pickers de criação/atualização ao useTableFilters, exibir toasts e loaders para criar, editar, excluir e enviar mensagem e garantir acessibilidade com foco de teclado e aria-labels nos controles e ícones de ação. A página deve exibir um botão “Novo Local”.
+
+[Nota: Ordenação]
+A ordenação deve usar o estado sort de useTableFilters, com ícone de ordenação ao lado do título da coluna, alternando entre crescente e decrescente ao clicar e atualizando o estado.
+
+[Nota: Filtros]
+Acima da tabela, incluir um container TableFilters controlado pelos hooks useTableFilters e useFilterOptions; dentro dele:
+
+um TableSearchInput que faz busca geral (em Nome/Cliente/Empresa/Tipo/Cidade/Estado) e filtra automaticamente enquanto o usuário digita, sem botão de aplicar;
+
+Exibir chips dos filtros ativos (por exemplo, “Empresa: Matriz ×”, “Tipo: Loja ×”, intervalos de datas), cada chip removível individualmente;
+
+ação “Limpar tudo” integrada ao estado de useTableFilters;
+
+TableFilterSelect para Cliente, Empresa, Tipo e Cidade/Estado, cada um integrado ao estado de useTableFilters, refletindo como chips e atualizando instantaneamente a listagem ao selecionar/limpar;
+
+quaisquer filtros adicionais — como Data de Criação e Data de Atualização — devem ser registrados em useTableFilters e expostos no TableFilters por meio de date range pickers, refletindo nos chips; toda aplicação ou remoção de filtro deve atualizar instantaneamente a listagem.
+
+[Nota: Exibir chips para barra de pesquisa]
+Em TableSearchInput também deve renderizar os chips dos filtros ativos expostos por useTableFilters (por exemplo, “Técnico ×”, “Ana Costa ×”), enquanto o usuário digita.
+
+[Nota: Abas das opções criar, editar e visualizar]
+Ao criar, editar ou visualizar um Local será aberto um pop-up reutilizável com as quatro abas: Dados, Fretes, Sistema e Mensagens.
+
+[Nota: Aba Dados]
+Campos:
+
+Nome (texto) — obrigatório
+Tipo de Local (select) — obrigatório
+Cliente (select/autocomplete) — obrigatório
+Empresa (select/autocomplete) — obrigatório
+Descrição (textarea) — opcional
+CEP (texto, máscara/validação) — obrigatório
+Estado (UF, select) — obrigatório
+SP (campo fornecido pelo solicitante; se “SP” representar um atalho/checkbox para pré-definir “Estado=SP”, manter como controle booleano)
+Logradouro (texto) — obrigatório
+Número (texto) — obrigatório
+Complemento (texto) — opcional
+Bairro (texto) — obrigatório
+Cidade (texto/autocomplete) — obrigatório
+
+[Nota: Aba Fretes]
+Campos:
+
+Valores de Frete: Moto, Carro Hatch e Utilitário (campos numéricos com máscara monetária, validação ≥ 0, permitir duas casas decimais).
+Comportamento: validação inline, feedback de erro próximo aos campos, salvar atualiza imediatamente o registro base e a listagem.
+
+[Nota: Aba Sistema]
+Na aba "Sistema" que exibe uma timeline técnica dinâmica com histórico do registro em ordem cronológica (mais recentes primeiro) dentro de um ScrollArea de 400px de altura. Cada evento deve ter: coluna esquerda com ícone circular de 40x40px (w-10 h-10) sobre fundo azul semi-transparente (bg-primary/10) e ícone azul (text-primary) de 20px (w-5 h-5) do lucide-react, conectados por linha vertical cinza (bg-border) de 1px que para no último item; coluna direita com título do evento em negrito (font-semibold text-sm), linha de metadados com micro-ícone UserRound (w-3.5 h-3.5) + nome do usuário e micro-ícone CalendarClock + timestamp formatado em português "dd/MM/yyyy 'às' HH:mm" usando date-fns e locale ptBR, tudo em text-xs text-muted-foreground, separados por border-b exceto o último item.
+Mapeie os tipos de evento para ícones: "created" usa CirclePlus, "edited" usa PencilLine, "marked" usa Tag, "deleted" usa Trash2, "restored" usa RotateCcw, todos com a mesma cor azul (text-primary e bg-primary/10). A interface TimelineEvent deve ter id (string), type (union dos 5 tipos), user (string), timestamp (Date) e description (string). O componente Timeline recebe array de events, ordena por timestamp decrescente e renderiza cada TimelineItem passando a prop isLast para o último elemento controlar a linha vertical.
+
+[Nota: Aba Mensagens]
+Na aba “Mensagens”, crie um sistema de chat colaborativo moderno usando React, TypeScript, Tailwind CSS e componentes shadcn/ui com as seguintes especificações:
+
+ESTRUTURA DE COMPONENTES:
+
+Componente Principal (ChatColaborativo.tsx)
+Gerencia estado de mensagens e participantes
+Props: recordTitle (título do registro), recordId (ID do registro)
+Estado inicial com 4 participantes mockados com avatares do DiceBear
+Mensagens iniciais demonstrando funcionalidades de menção
+Layout: Container flex vertical sem scroll, distribuindo espaço entre título fixo, área de mensagens com scroll, e input fixo
+
+Lista de Mensagens (MessageList.tsx)
+ScrollArea com padding adequado
+Mensagens alinhadas à esquerda (outros) e direita (usuário atual)
+Cada mensagem contém:
+Avatar circular (40x40px)
+Nome do autor em negrito
+Timestamp formatado em português (Hoje às HH:mm, Ontem às HH:mm, ou DD/MM/YYYY às HH:mm)
+Bolha de mensagem com bordas arredondadas
+Conteúdo com suporte a menções destacadas
+Mensagens do usuário: fundo azul vibrante, texto branco
+Mensagens de outros: fundo cinza claro (muted), texto escuro
+Menções (@nome) destacadas com fundo semi-transparente da cor primary
+
+Input de Mensagens (MessageInput.tsx)
+Textarea expansível com altura mínima de 80px
+Placeholder: "Digite sua mensagem... Use @ para mencionar alguém"
+Botão de envio azul com ícone Send do Lucide
+Sistema de menções com @:
+Detecta @ digitado e abre popover de sugestões acima do input
+Filtra participantes conforme texto digitado após @
+Popover mostra avatar, nome e cargo
+Ao clicar, insere menção completa no texto
+Fecha automaticamente após seleção
+Hint: "Pressione Enter para enviar, Shift+Enter para nova linha"
+Validação de menções ao enviar (apenas usuários válidos)
+
+DESIGN SYSTEM (CSS Variables):
+
+--primary: 217 83% 58%; /* Azul vibrante para mensagens enviadas /
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%; / Cinza claro para mensagens recebidas */
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+
+[Nota: Aba Fretes]
+
+Na aba "Fretes" do módulo /cadastro/locais, criar uma interface que permite visualizar a rota entre origem e destino e configurar valores de frete para diferentes tipos de veículos.
+
+A aba deve ser dividida em duas seções principais:
+
+Seção 1 - Mapa de Rota:
+
+Título "Mapa de Rota" em negrito (text-lg font-semibold)
+Subtítulo explicativo: "Visualize a rota entre origem e destino para calcular o frete" (text-sm text-muted-foreground)
+Dois campos de entrada lado a lado (grid grid-cols-2 gap-4):
+Origem: input de texto com ícone MapPin à esquerda, placeholder "Endereço de origem", valor inicial "Rua Monte Casino, 382"
+Destino: input de texto com ícone MapPin à esquerda, placeholder "Endereço de destino", preenchido automaticamente com o endereço completo do local usando useWatch nos campos logradouro, numero, bairro, cidade, estado e cep
+Botões de seleção de tipo de veículo (flex gap-2, cada botão com flex-1):
+Moto: ícone Bike (lucide-react) + texto "Moto"
+Carro: ícone Car + texto "Carro"
+Utilitário: ícone Truck + texto "Utilitário"
+Estilo: variant="default" quando selecionado, variant="outline" quando não selecionado
+Iframe do Google Maps Embed API exibindo a rota:
+URL: https://www.google.com/maps/embed/v1/directions?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&origin=${encodeURIComponent(origem)}&destination=${encodeURIComponent(destino)}&mode=driving
+Dimensões: altura 400px, largura 100%, bordas arredondadas (rounded-lg), sombra (shadow-sm)
+State dinâmico: key={${tipoVeiculo}-${origem}-${destino}} para forçar reload ao mudar parâmetros
+Estado vazio: se origem ou destino não preenchidos, exibir placeholder centralizado com ícone MapPin (w-16 h-16 opacity-50) e texto "Preencha origem e destino para visualizar a rota"
+Seção 2 - Valores de Frete:
+
+Separador visual: border-top (border-t) e padding-top (pt-6)
+Título "Valores de Frete" em negrito (text-lg font-semibold)
+Subtítulo: "Configure os valores de frete para diferentes tipos de veículos" (text-sm text-muted-foreground)
+Três campos de moeda lado a lado (grid grid-cols-3 gap-4):
+Frete Moto: campo freteMoto (FormField com control do react-hook-form)
+Frete Carro Hatch: campo freteCarroHatch
+Frete Utilitário: campo freteUtilitario
+Todos os campos com:
+Prefixo "R$" posicionado à esquerda (absolute left-3)
+Máscara de moeda brasileira (0,00) usando funções formatCurrency e handleCurrencyChange
+Validação: valores maiores ou iguais a zero (min(0) no schema Zod)
+Placeholder "0,00"
+Desabilitados em modo visualização (disabled={viewMode})
+Box informativo ao final (rounded-lg bg-muted p-4 mt-6):
+Texto: "Observação: Os valores de frete devem ser maiores ou iguais a zero. Use vírgula para separar os centavos (ex: 25,50)."
+Funcionalidades técnicas:
+
+Usar useWatch do react-hook-form para monitorar mudanças nos campos de endereço (logradouro, numero, bairro, cidade, estado, cep)
+useEffect para atualizar o campo destino automaticamente quando qualquer campo de endereço mudar
+State local para origem, destino e tipoVeiculo (tipo: "moto" | "carro" | "utilitario")
+Funções auxiliares:
+formatCurrency(value: string): remove caracteres não numéricos, divide por 100 e formata em pt-BR com 2 casas decimais
+handleCurrencyChange(value: string, onChange: (value: number) => void): converte entrada formatada para número decimal e chama onChange
+Props do componente: control: Control<any> (do react-hook-form) e viewMode?: boolean
+[Nota: Aba Mapa]
+
+Na aba "Mapa" do módulo /cadastro/locais, criar uma visualização estática do endereço do local usando Google Maps Embed API.
+
+Estrutura:
+
+Card informativo no topo (flex items-start gap-2 p-4 rounded-lg bg-muted/50 border):
+
+Ícone MapPin (w-5 h-5 text-primary flex-shrink-0) no canto superior esquerdo
+Coluna direita (flex-1 min-w-0):
+Label "Endereço" (text-sm font-medium mb-1)
+Endereço completo em texto (text-sm text-muted-foreground break-words)
+Formato: ${logradouro} ${numero}, ${bairro}, ${cidade} - ${estado}, ${cep}
+Iframe do Google Maps Embed API:
+
+URL: https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(endereco)}
+Dimensões: altura 500px, largura 100%
+Estilos: bordas arredondadas (rounded-lg), borda (border), sombra (shadow-sm)
+Atributos: allowFullScreen, loading="lazy", referrerPolicy="no-referrer-when-downgrade"
+Estado vazio:
+
+Se os campos obrigatórios (logradouro, numero, cidade, estado) não estiverem preenchidos:
+Exibir container centralizado (flex flex-col items-center justify-center h-[400px] text-muted-foreground)
+Ícone MapPin grande (w-16 h-16 mb-4 opacity-50)
+Título: "Nenhum endereço disponível" (text-lg font-medium)
+Subtítulo: "Preencha os dados do local na aba 'Dados' para visualizar o mapa" (text-sm)
+Funcionalidades técnicas:
+
+Usar useWatch do react-hook-form para monitorar os campos: logradouro, numero, bairro, cidade, estado, cep
+Construir endereco concatenando todos os campos com vírgulas e hífens
+Validar hasAddress verificando se logradouro, numero, cidade e estado estão preenchidos
+Props do componente: control: any (do react-hook-form)
+
+[Nota: Final]
