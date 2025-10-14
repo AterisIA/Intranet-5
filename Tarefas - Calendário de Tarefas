@@ -1,0 +1,183 @@
+[Nota: Intranet - Tarefas - Calendário de Tarefas]
+
+[Nota: Onde]
+Dentro do macro item de menu *Tarefas, criar um novo subitem chamado **“Calendário de Tarefas segunda versão”*, posicionado logo abaixo de “Controle de Tarefas”.
+A tela exibirá um *calendário interativo e analítico, permitindo **visualizar e gerir visualmente* as tarefas existentes, com *filtros por dia, funcionário (responsável), projeto, status, prioridade* e *busca geral*, todos controlados pelos hooks useTableFilters e useFilterOptions.
+
+Deve apresentar *claramente a quantidade de atividades em cada dia, **destacar atividades vencidas, e oferecer **duas visões adicionais* para gestão operacional:
+
+* *Visão Fechamento* → foca nas tarefas que *vencem no dia*.
+* *Visão Andamento* → mostra todas as tarefas *em aberto* durante o período ativo (não concluídas).
+
+---
+
+[Nota: Estrutura e Layout]
+A tela deve possuir:
+
+* Um *header* com o título “Calendário de Tarefas”;
+* Um botão “Criar novo item” que abre o mesmo pop-up reutilizável com as abas *Dados, **Sistema* e *Mensagem*;
+* Botões de *view switch*:
+
+  * *Mês, **Semana, **Dia, **Lista*,
+  * e as novas visões *Fechamento* e *Andamento*;
+* Um toggle “Por Responsável” (Resource Timeline) que alterna a visão agrupada por colaborador;
+* Um container de filtros *TableFilters* acima do calendário, seguindo o padrão da tabela de tarefas.
+
+---
+
+[Nota: Filtros]
+Dentro do container TableFilters:
+
+* Um indicador textual “Filtros”;
+
+* Um campo *TableSearchInput* que faz busca em nome/descrição e atualiza automaticamente enquanto o usuário digita;
+
+* Seis filtros seletivos:
+
+  * Projetos (TableFilterSelect source=“pr”projetos)
+  * Status (TableFilterSelect source=“status”)
+  * Prioridade (TableFilterSelect source=“pr”prioridade)
+  * Responsável (TableFilterSelect source=“pr”responsável)
+  * Prazo (TableFilterSelect source=“pr”prazo) usando Date Range Picker para seleção de intervalo de datas;
+  * *Vencidas (TableFilterSelect source=“vencidas”)* — filtro booleano com opções Todas, Somente vencidas, Somente em dia;
+
+* Renderizar abaixo os *chips dos filtros ativos* expostos por useTableFilters (por exemplo: “Limpeza ×”, “Ana Costa ×”, “Vencidas ×”, “10/10 a 15/10 ×”), todos removíveis individualmente;
+
+* Ação “Limpar tudo” integrada ao estado de useTableFilters;
+
+* Toda aplicação ou remoção de filtro deve *atualizar instantaneamente* o calendário.
+
+---
+
+[Nota: Dados]
+Os dados exibidos no calendário devem ser os mesmos da tabela “Controle de Tarefas”.
+Campos mínimos: id, projeto, descricao, orcamento, responsavel, status, prazo, prioridade, titulo.
+Os eventos do calendário seguem o formato:
+
+
+{
+  id,
+  title,
+  start,
+  end?,
+  resourceId?,
+  extendedProps: {
+    projeto,
+    descricao,
+    orcamento,
+    responsavel,
+    status,
+    prioridade,
+    vencida: boolean
+  }
+}
+
+
+---
+
+[Nota: Cores por Status e Indicadores Visuais]
+
+* aberto → azul (text-primary, bg-primary/10)
+* em_andamento → âmbar (bg-amber-100 text-amber-700)
+* bloqueado → vermelho (bg-red-100 text-red-700)
+* concluído → verde (bg-green-100 text-green-700)
+* *vencida* → borda ou ícone de alerta *vermelho vibrante* (border-red-500 text-red-600), sobreposição leve no evento (bg-red-50/80)
+* *múltiplas tarefas no mesmo dia* → célula do calendário exibe contador no canto superior direito (badge +N tarefas), com tooltip listando os títulos das tarefas.
+
+---
+
+[Nota: Interação com Calendário]
+Usar uma biblioteca robusta (exemplo: FullCalendar) com visões *Mês, **Semana, **Dia, **Lista, **Fechamento, **Andamento* e *Por Responsável*.
+
+* Locale: pt-BR
+* Timezone: America/Sao_Paulo
+* Semana iniciando na segunda-feira
+
+Cada evento deve renderizar:
+
+* Título (truncate)
+* Badge de status colorido
+* Linha de metadados (ícones UserRound + nome do responsável; CalendarClock + horário)
+* Tooltip exibindo projeto, prioridade e descrição
+* *Se vencido*, adicionar marcador vermelho (ex: ⚠ ou badge “Atrasado”).
+
+---
+
+[Nota: Visões Específicas]
+
+*Visão Fechamento:*
+
+* Exibe somente tarefas cujo prazo *é igual ao dia atual*.
+* Ideal para controle diário de vencimentos.
+* Células destacadas com borda azul-clara e contagem de tarefas do dia.
+
+*Visão Andamento:*
+
+* Exibe todas as tarefas cujo status ≠ “concluído” e data atual está *entre início e prazo*.
+* Ideal para acompanhamento geral de progresso e carga operacional.
+* Permite visualizar simultaneamente atividades em aberto por funcionário ou projeto.
+
+---
+
+[Nota: Ações no Calendário]
+
+* *Click em evento*: abre pop-up com abas Dados, Sistema e Mensagem;
+* *Drag & Drop / Resize*: atualiza automaticamente o campo prazo (start/end) e gera um evento edited na timeline da aba Sistema;
+* *Criar novo item*: abre pop-up em branco; botão Salvar habilitado somente com campos obrigatórios preenchidos; ao salvar, adiciona evento e registra created na timeline;
+* *Tooltip de célula*: se houver múltiplas tarefas no mesmo dia, exibe lista compacta das tarefas ao passar o mouse.
+
+---
+
+[Nota: Aba Sistema]
+A timeline segue o mesmo padrão já definido: ícones mapeados (“created” → CirclePlus, “edited” → PencilLine, “marked” → Tag, “deleted” → Trash2, “restored” → RotateCcw) com layout de 400px de altura e linha vertical.
+
+---
+
+[Nota: Aba Mensagem]
+Reutilizar o chat colaborativo conforme especificação anterior (menções, popover de participantes, Enter para enviar, Shift+Enter para nova linha, etc).
+
+---
+
+[Nota: Filtros e Sincronização]
+
+* A busca atua em titulo e descricao (case-insensitive).
+* Os filtros projeto, status, prioridade e responsável aceitam múltiplas seleções.
+* O filtro de prazo exibe apenas eventos com datas dentro ou cruzando o intervalo selecionado.
+* O filtro *vencidas* mostra apenas tarefas com prazo < hoje e status diferente de “concluído”.
+* Todos os filtros e chips são sincronizados com o calendário em tempo real.
+
+---
+
+[Nota: Regras de Exibição e Comportamento]
+
+1. Trocar de visão (Mês/Semana/Dia/Lista/Fechamento/Andamento/Responsável) não perde os filtros ativos;
+2. A busca reflete imediatamente no calendário;
+3. Selecionar Responsável filtra também na visão “Por Responsável”;
+4. Drag & drop persiste alterações e gera histórico na timeline;
+5. “Criar novo item” adiciona evento e gera registro “created”;
+6. Chips e “Limpar tudo” funcionam como no módulo de tabela;
+7. Locale pt-BR com date-fns;
+8. Responsividade: em mobile muda para visão Lista automaticamente;
+9. Dias com múltiplas tarefas exibem contador “+N”;
+10. Tarefas vencidas exibem destaque visual (cor e/ou ícone).
+
+---
+
+[Nota: Integração e Persistência]
+Funções de integração com Supabase (ou fonte atual):
+
+* fetchTasks(filters)
+* createTask(data)
+* updateTask(id, patch)
+* logSystemEvent(taskId, { type, user, timestamp, description })
+
+---
+
+[Nota: Design e Estilo]
+Seguir o design system (Tailwind + shadcn/ui), com cantos arredondados 2xl, espaçamento consistente (gap-4), tipografia legível, contraste de cores AA, ícones do Lucide (UserRound, CalendarClock, CirclePlus, PencilLine, Tag, Trash2, RotateCcw).
+Usar *badges e contadores suaves* para múltiplas tarefas por dia e *indicadores visuais consistentes* para vencidas.
+
+---
+
+[Nota: Final]
+O objetivo é criar um *calendário totalmente funcional, analítico e sincronizado* com os filtros de tarefas existentes, permitindo *gerenciar visualmente, **detectar atrasos facilmente, e **analisar a carga diária e em andamento* das atividades de forma colaborativa e responsiva.
