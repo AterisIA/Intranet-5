@@ -1,0 +1,151 @@
+[Nota: Intranet - Projetos e Orçamentos - Cálculo de Impostos]
+
+[Nota: Onde]
+Na aba /impostos haverá uma tabela interativa exibindo os cálculos já registrados, com as colunas:
+Descrição, Impostos %, Porcentagem %, Base de Cálculo, Responsável e Ações.
+Acima da tabela, haverá um botão “Criar novo item” posicionado à direita, que abrirá um pop-up reutilizável com abas Dados, Sistema e Mensagens.
+A tabela deve permitir ordenar por qualquer coluna (crescente e decrescente) e ser atualizada dinamicamente após criação, edição ou exclusão de registros.
+
+[Nota: Ordenação]
+A ordenação será controlada pelo estado sort do hook useTableFilters.
+Cada título de coluna exibirá um ícone de ordenação (↑↓) ao lado, alternando a direção e atualizando o estado ao clicar.
+O estado sort será persistente durante a sessão.
+
+[Nota: Filtros]
+Acima da tabela, um container TableFilters (controlado pelos hooks useTableFilters e useFilterOptions) deve conter:
+
+TableSearchInput para busca geral em “Descrição” ou “Responsável”, filtrando conforme o usuário digita (sem botão de aplicar);
+
+Dois TableFilterSelect:
+
+source="baseCalculo" com opções “Margem Administrativa” e “Valor Total”;
+
+source="responsavel" com os usuários disponíveis (mock inicial: Ana Costa, Pedro Martins, Fernanda Silva).
+Abaixo dos filtros, devem aparecer os chips dos filtros ativos (ex: “Ana Costa ×”, “Margem Administrativa ×”), cada um removível individualmente, e o botão “Limpar tudo” para resetar os filtros.
+Filtros adicionais (ex.: intervalo de datas) devem ser registrados em useTableFilters e refletidos nos chips.
+
+[Nota: O que]
+Cada linha da tabela mostrará os dados do cálculo e três botões de ação visíveis:
+
+Visualizar (ícone Olho)
+
+Editar (ícone Lápis)
+
+Excluir (ícone Lixeira)
+
+A coluna “Ações” deve estar centralizada e os ícones alinhados horizontalmente.
+Ao clicar em qualquer botão, deve abrir um pop-up com as três abas (Dados, Sistema, Mensagem).
+
+[Nota: Aba Dados]
+
+Na aba Dados, o formulário conterá os seguintes campos:
+
+Campo	Tipo	Obrigatório	Observações
+Descrição	Input texto	✅	Exemplo: “CURY”
+Impostos %	Input numérico	✅	Exibir com vírgula decimal (ex: 20,482)
+Porcentagem %	Input numérico	✅	Exemplo: 17,00
+Base de Cálculo	RadioGroup	✅	Opções: “Margem Administrativa” (default) e “Valor Total”
+
+O campo “Responsável” é atribuído automaticamente ao usuário logado e não é exibido no formulário.
+
+O botão “Salvar” será ativado apenas quando todos os campos obrigatórios estiverem preenchidos.
+
+Ao salvar, o registro é adicionado à tabela e o pop-up é fechado automaticamente.
+
+O botão “Cancelar” apenas fecha o pop-up.
+
+[Nota: Aba Sistema]
+
+A aba Sistema exibirá uma timeline técnica mostrando o histórico do registro, em ordem cronológica (mais recentes primeiro) dentro de um ScrollArea (altura 400px).
+
+Cada evento conterá:
+
+Coluna esquerda: ícone circular (w-10 h-10) com fundo azul translúcido (bg-primary/10) e ícone do tipo (w-5 h-5 text-primary) conectado por linha vertical (bg-border) de 1px que termina no último item;
+
+Coluna direita: título do evento (font-semibold text-sm), seguido de metadados (text-xs text-muted-foreground) com ícones UserRound (usuário) e CalendarClock (data), formatado "dd/MM/yyyy 'às' HH:mm" usando date-fns com locale ptBR.
+
+Mapeamento dos tipos de evento → ícones lucide-react:
+
+"created" → CirclePlus
+
+"edited" → PencilLine
+
+"marked" → Tag
+
+"deleted" → Trash2
+
+"restored" → RotateCcw
+
+Interface:
+
+interface TimelineEvent {
+  id: string
+  type: 'created' | 'edited' | 'marked' | 'deleted' | 'restored'
+  user: string
+  timestamp: Date
+  description: string
+}
+
+
+Componente:
+Timeline recebe events: TimelineEvent[], ordena por timestamp desc e passa isLast ao último item para interromper a linha vertical.
+
+[Nota: Aba Mensagens]
+
+A aba Mensagem será um chat colaborativo moderno com três componentes principais:
+
+1. ChatColaborativo.tsx
+
+Gerencia mensagens e participantes (mock inicial com 4 pessoas e avatares DiceBear).
+
+Props: recordTitle e recordId.
+
+Layout em coluna (flex-col) com título fixo, área de mensagens rolável e input fixo no rodapé.
+
+2. MessageList.tsx
+
+Área de mensagens (ScrollArea) com padding.
+
+Mensagens alinhadas à direita (usuário atual) e à esquerda (outros).
+
+Cada mensagem contém avatar (40x40px), nome, timestamp (“Hoje às HH:mm”, “Ontem às HH:mm” ou “DD/MM/YYYY às HH:mm”) e bolha arredondada.
+
+Estilo:
+
+Usuário atual → bg-primary text-primary-foreground
+
+Outros → bg-muted text-foreground
+
+Menções → destacadas bg-primary/20.
+
+3. MessageInput.tsx
+
+Textarea expansível (mínimo 80px).
+
+Placeholder: “Digite sua mensagem... Use @ para mencionar alguém”.
+
+Dica: “Enter envia, Shift+Enter nova linha”.
+
+Botão de envio azul (Send do Lucide).
+
+Sistema de menções: ao digitar “@”, abre popover de sugestões (avatar + nome + cargo).
+
+Validação para apenas usuários válidos.
+
+[Nota: Design System (CSS Variables)]
+--primary: 217 83% 58%; /* Azul vibrante */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+[Nota: Criar item]
+
+O botão “Criar novo item” abre o pop-up nas três abas (Dados, Sistema, Mensagem) em branco.
+O botão “Salvar” só ativa quando todos os campos obrigatórios forem preenchidos.
+Após o salvamento, o novo item é inserido automaticamente na tabela.
+
+[Nota: Final]
+
+Toda a interface deve ser construída com React + TypeScript + Tailwind + shadcn/ui + lucide-react + date-fns (ptBR), respeitando o estilo da intranet Ares — layout limpo, profissional, com cores neutras e azul como cor primária, tipografia consistente, espaçamento amplo e interações suaves (framer-motion opcional).
