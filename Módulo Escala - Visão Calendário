@@ -1,0 +1,690 @@
+Lovable
+11:35 AM on Oct 15
+
+Thought for 10 seconds
+Vou popular o dashboard com dados fictícios para que fique visualmente completo e bonito.
+
+Edited
+useEscalasDashboardData.tsx
+Dashboard populado com dados fictícios realistas! Agora exibe KPIs com taxas de resposta e confirmação, gráficos de evolução temporal, distribuição de status em pizza, ranking de top 10 performers e tabela completa.
+
+
+Restore
+
+Code
+
+Populate dashboard with mock data
+Preview
+
+
+
+
+Em /escalas/dashboard remova os botões de Gráfico e Matriz, deixe o titulo dele apenas como Dashboard ao invés de Dashboard Avançado
+Lovable
+11:38 AM on Oct 15
+
+Show all
+1 edit made
+Pronto! Removi os botões de Gráfico e Matriz e mudei o título para apenas "Dashboard".
+
+
+Restore
+
+Code
+
+Refactor Escalas Dashboard page
+Preview
+
+
+
+
+
+davi.silva@aresgroup.com.br
+[Nota: Intranet - Financeiro - Cálculo de Impostos]
+
+[Nota: Onde]
+Na aba /impostos haverá uma tabela interativa exibindo os cálculos já registrados, com as colunas:
+Descrição, Impostos %, Porcentagem %, Base de Cálculo, Responsável e Ações.
+Acima da tabela, haverá um botão “Criar novo item” posicionado à direita, que abrirá um pop-up reutilizável com abas Dados, Sistema e Mensagens.
+A tabela deve permitir ordenar por qualquer coluna (crescente e decrescente) e ser atualizada dinamicamente após criação, edição ou exclusão de registros.
+
+[Nota: Ordenação]
+A ordenação será controlada pelo estado sort do hook useTableFilters.
+Cada título de coluna exibirá um ícone de ordenação (↑↓) ao lado, alternando a direção e atualizando o estado ao clicar.
+O estado sort será persistente durante a sessão.
+
+[Nota: Filtros]
+Acima da tabela, um container TableFilters (controlado pelos hooks useTableFilters e useFilterOptions) deve conter:
+
+TableSearchInput para busca geral em “Descrição” ou “Responsável”, filtrando conforme o usuário digita (sem botão de aplicar);
+
+Dois TableFilterSelect:
+
+source="baseCalculo" com opções “Margem Administrativa” e “Valor Total”;
+
+source="responsavel" com os usuários disponíveis (mock inicial: Ana Costa, Pedro Martins, Fernanda Silva).
+Abaixo dos filtros, devem aparecer os chips dos filtros ativos (ex: “Ana Costa ×”, “Margem Administrativa ×”), cada um removível individualmente, e o botão “Limpar tudo” para resetar os filtros.
+Filtros adicionais (ex.: intervalo de datas) devem ser registrados em useTableFilters e refletidos nos chips.
+
+[Nota: O que]
+Cada linha da tabela mostrará os dados do cálculo e três botões de ação visíveis:
+
+Visualizar (ícone Olho)
+
+Editar (ícone Lápis)
+
+Excluir (ícone Lixeira)
+
+A coluna “Ações” deve estar centralizada e os ícones alinhados horizontalmente.
+Ao clicar em qualquer botão, deve abrir um pop-up com as três abas (Dados, Sistema, Mensagem).
+
+[Nota: Aba Dados]
+
+Na aba Dados, o formulário conterá os seguintes campos:
+
+Campo	Tipo	Obrigatório	Observações
+Descrição	Input texto	✅	Exemplo: “CURY”
+Impostos %	Input numérico	✅	Exibir com vírgula decimal (ex: 20,482)
+Porcentagem %	Input numérico	✅	Exemplo: 17,00
+Base de Cálculo	RadioGroup	✅	Opções: “Margem Administrativa” (default) e “Valor Total”
+
+O campo “Responsável” é atribuído automaticamente ao usuário logado e não é exibido no formulário.
+
+O botão “Salvar” será ativado apenas quando todos os campos obrigatórios estiverem preenchidos.
+
+Ao salvar, o registro é adicionado à tabela e o pop-up é fechado automaticamente.
+
+O botão “Cancelar” apenas fecha o pop-up.
+
+[Nota: Aba Sistema]
+
+A aba Sistema exibirá uma timeline técnica mostrando o histórico do registro, em ordem cronológica (mais recentes primeiro) dentro de um ScrollArea (altura 400px).
+
+Cada evento conterá:
+
+Coluna esquerda: ícone circular (w-10 h-10) com fundo azul translúcido (bg-primary/10) e ícone do tipo (w-5 h-5 text-primary) conectado por linha vertical (bg-border) de 1px que termina no último item;
+
+Coluna direita: título do evento (font-semibold text-sm), seguido de metadados (text-xs text-muted-foreground) com ícones UserRound (usuário) e CalendarClock (data), formatado "dd/MM/yyyy 'às' HH:mm" usando date-fns com locale ptBR.
+
+Mapeamento dos tipos de evento → ícones lucide-react:
+
+"created" → CirclePlus
+
+"edited" → PencilLine
+
+"marked" → Tag
+
+"deleted" → Trash2
+
+"restored" → RotateCcw
+
+Interface:
+
+interface TimelineEvent {
+  id: string
+  type: 'created' | 'edited' | 'marked' | 'deleted' | 'restored'
+  user: string
+  timestamp: Date
+  description: string
+}
+
+
+Componente:
+Timeline recebe events: TimelineEvent[], ordena por timestamp desc e passa isLast ao último item para interromper a linha vertical.
+
+[Nota: Aba Mensagens]
+
+A aba Mensagem será um chat colaborativo moderno com três componentes principais:
+
+1. ChatColaborativo.tsx
+
+Gerencia mensagens e participantes (mock inicial com 4 pessoas e avatares DiceBear).
+
+Props: recordTitle e recordId.
+
+Layout em coluna (flex-col) com título fixo, área de mensagens rolável e input fixo no rodapé.
+
+2. MessageList.tsx
+
+Área de mensagens (ScrollArea) com padding.
+
+Mensagens alinhadas à direita (usuário atual) e à esquerda (outros).
+
+Cada mensagem contém avatar (40x40px), nome, timestamp (“Hoje às HH:mm”, “Ontem às HH:mm” ou “DD/MM/YYYY às HH:mm”) e bolha arredondada.
+
+Estilo:
+
+Usuário atual → bg-primary text-primary-foreground
+
+Outros → bg-muted text-foreground
+
+Menções → destacadas bg-primary/20.
+
+3. MessageInput.tsx
+
+Textarea expansível (mínimo 80px).
+
+Placeholder: “Digite sua mensagem... Use @ para mencionar alguém”.
+
+Dica: “Enter envia, Shift+Enter nova linha”.
+
+Botão de envio azul (Send do Lucide).
+
+Sistema de menções: ao digitar “@”, abre popover de sugestões (avatar + nome + cargo).
+
+Validação para apenas usuários válidos.
+
+[Nota: Design System (CSS Variables)]
+--primary: 217 83% 58%; /* Azul vibrante */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+[Nota: Criar item]
+
+O botão “Criar novo item” abre o pop-up nas três abas (Dados, Sistema, Mensagem) em branco.
+O botão “Salvar” só ativa quando todos os campos obrigatórios forem preenchidos.
+Após o salvamento, o novo item é inserido automaticamente na tabela.
+
+[Nota: Final]
+
+Toda a interface deve ser construída com React + TypeScript + Tailwind + shadcn/ui + lucide-react + date-fns (ptBR), respeitando o estilo da intranet Ares — layout limpo, profissional, com cores neutras e azul como cor primária, tipografia consistente, espaçamento amplo e interações suaves (framer-motion opcional).
+Lovable
+11:47 AM on Oct 15
+
+Thought for 13 seconds
+Vou criar a página completa de Impostos com tabela interativa, filtros, ordenação e diálogo com 3 abas.
+
+Show all
+6 edits made
+Página de Impostos criada com sucesso, incluindo tabela interativa com ordenação, filtros dinâmicos com chips removíveis e diálogo com 3 abas reutilizando componentes existentes.
+
+
+Restore
+
+Code
+
+Add Impostos page
+Preview
+
+
+
+
+
+Restore
+
+Code
+
+Visual edit in Lovable
+Preview
+
+[Nota: Onde]
+
+Dentro do menu "Escalas", crie o submenu chamado "Escalas"
+
+[Nota: O que]
+
+O prompt abaixo é de uma tela já criada em outro projeto, preciso que você replique ela com excelência, mas ignorando a questão de funcionalidades e banco de dados, o foco nesse momento é criação da interface visual. Importante a página seguir o mesmo padrão visual das demais.
+
+Crie uma aplicação React com TypeScript que implemente uma página de gerenciamento de escalas de trabalho. A aplicação deve ser totalmente funcional e independente, sem necessidade de autenticação ou outras telas. Use Vite como bundler, React 18, TypeScript, Tailwind CSS, Shadcn UI components, Supabase como backend e React Hook Form para formulários.
+
+Configure a estrutura de pastas seguindo o padrão src/pages, src/components/ui, src/hooks e src/integrations/supabase. Instale as dependências necessárias incluindo react, react-dom, typescript, vite, tailwindcss, @supabase/supabase-js, lucide-react para ícones, sonner para toasts, react-hook-form, zod para validação, date-fns para manipulação de datas e react-phone-number-input para inputs de telefone.
+
+Implemente a página principal em src/pages/Escalas.tsx que deve listar todas as escalas cadastradas no sistema com capacidade de busca por nome, exibindo cards para cada escala contendo nome da pessoa, data/hora de início e término, telefone quando disponível, status ativa ou finalizada e opções de ações via dropdown menu. A página deve ter um cabeçalho com título Escalas, subtítulo Escalas ativas do sistema e botão Criar Escala no canto superior direito.
+
+Defina as interfaces TypeScript necessárias incluindo Escala com campos idescala number, nomepessoaescala string, dataescala string, finalescala opcional string, telefone opcional string, folgas_datas opcional array de strings, banco_horas_datas opcional array de strings, folgas_dias_semana opcional array de numbers e domingo_mes opcional number. Defina também Coordenador com id_coordenador string e nome string, Plantao com id_plantao string, nome string, id_empresa string e empresa opcional objeto com nome string, e ContatoTerceirizacao com id string, name string, phone opcional string e email opcional string.
+
+Gerencie o estado da aplicação usando useState hooks para escalas array, loading boolean, searchTerm string, isDialogOpen boolean, editingEscala objeto ou null, isCreating boolean, coordenadores array, plantoes array, contatos array, selectedEmpresa string e formData objeto contendo todos os campos do formulário de criação. Use useEffect para carregar dados iniciais ao montar o componente chamando fetchEscalas, fetchCoordenadores, fetchPlantoes e fetchContatos.
+
+Implemente a função fetchEscalas que deve buscar todos os registros da tabela escala no Supabase ordenados por dataescala descendente, tratando erros com toast de erro e atualizando o estado de loading. Implemente fetchCoordenadores buscando da tabela coordenador ordenado por nome, fetchPlantoes buscando da tabela plantao com join na tabela empresa para trazer o nome da empresa junto e fetchContatos buscando da tabela contatos_terceirizacao filtrando por status active ordenado por nome.
+
+Crie a função filteredEscalas que filtra o array de escalas comparando o searchTerm lowercase com nomepessoaescala lowercase. Implemente formatDate que recebe uma string de data e retorna formatado em pt-BR com dia, mês, ano, hora e minuto. Implemente formatDuration que recebe data início obrigatória e data fim opcional, se não houver data fim retorna a data início formatada seguido de hífen e texto Em andamento, caso contrário calcula a diferença em horas e minutos e retorna ambas as datas formatadas com a duração entre parênteses.
+
+Implemente handleEditEscala que recebe uma escala, seta editingEscala com o objeto recebido, isCreating como false e abre o dialog. Implemente handleCreateEscala que reseta formData para valores vazios exceto arrays vazios para folgas_dias_semana e banco_horas_datas, reseta currentBancoData e selectedEmpresa, seta editingEscala para null, isCreating para true e abre o dialog.
+
+Implemente handleToggleDiaFolga que recebe um número representando dia da semana de zero a seis, se o dia já está no array folgas_dias_semana remove ele senão adiciona. Implemente handleAddBancoHoras que verifica se currentBancoData tem valor e não está duplicado no array banco_horas_datas, se válido adiciona a data ao array e limpa currentBancoData. Implemente handleRemoveBancoHoras que recebe uma data e remove ela do array banco_horas_datas.
+
+Implemente handlePlantaoChange que recebe plantaoId string, atualiza formData.id_plantao, busca o plantão correspondente no array plantoes e se encontrar empresa seta selectedEmpresa com o nome da empresa senão limpa selectedEmpresa. Implemente cleanPhoneNumber que remove todos os caracteres não numéricos de uma string de telefone usando regex substituindo tudo que não é dígito por string vazia.
+
+Implemente handleSubmitEscala que valida se nomepessoaescala e dataescala estão preenchidos exibindo toast de erro caso contrário, monta objeto escalaData com todos os campos do formData aplicando cleanPhoneNumber no telefone e convertendo campos vazios para null, faz insert na tabela escala do Supabase, trata erros com toast, em caso de sucesso exibe toast de sucesso, fecha o dialog e recarrega a lista chamando fetchEscalas.
+
+Renderize a página com estrutura div principal com padding 8 e space-y-6, contendo cabeçalho flex com título h1 text-3xl font-bold, parágrafo descritivo text-muted-foreground e botão Criar Escala com ícone Plus à direita. Abaixo renderize Card do shadcn com CardHeader contendo input de busca com ícone Search posicionado absolutamente à esquerda e placeholder Buscar por nome da pessoa.
+
+No CardContent renderize estado de loading mostrando texto Carregando escalas centralizado, ou se não estiver loading e filteredEscalas vazio mostre Nenhuma escala encontrada centralizado, senão mapeie filteredEscalas renderizando para cada escala um div flex com borda rounded-lg hover:bg-muted/50, dentro coloque avatar circular com ícone Users, nome da pessoa em h3 font-semibold text-lg, abaixo div com ícone Clock e texto da duração formatada, abaixo telefone se existir com emoji de telefone, à direita Badge mostrando Finalizada variant secondary se tiver finalescala senão Em andamento variant default, e DropdownMenu com DropdownMenuTrigger sendo Button ghost com ícone MoreHorizontal e DropdownMenuItem com ícone Edit e texto Ver Detalhes que chama handleEditEscala.
+
+Renderize Dialog do shadcn com open controlado por isDialogOpen e onOpenChange setando isDialogOpen, DialogContent com max-w-md, DialogHeader com DialogTitle mostrando Criar Nova Escala se isCreating senão Detalhes da Escala. Se isCreating renderize formulário com espaçamento space-y-4 contendo campo Select para escolher contato da terceirização preenchendo automaticamente nomepessoaescala e telefone ao selecionar, Input type datetime-local para dataescala obrigatório, Input type datetime-local para finalescala opcional, Select para pausa_minutos com opções 72 minutos e 60 minutos mostrando textos 1 hora e 12 minutos e 1 hora respectivamente.
+
+Continue o formulário com Label Dias da Semana de Folga e grid de botões representando Dom Seg Ter Qua Qui Sex Sáb usando valores 0 a 6, cada botão com variant secondary se o dia está em folgas_dias_semana senão outline, ao clicar chama handleToggleDiaFolga. Adicione campo para banco de horas com Input type date controlado por currentBancoData, Botão Adicionar Data que chama handleAddBancoHoras, e abaixo lista das datas adicionadas em Badge com X que chama handleRemoveBancoHoras.
+
+Adicione Select para domingo_mes com opções null Nenhum, 1 Primeiro domingo, 2 Segundo domingo, 3 Terceiro domingo, 4 Quarto domingo mostrando labels descritivos. Adicione PhoneInput da biblioteca react-phone-number-input para telefone com defaultCountry BR e placeholder opcional. Adicione Select para id_coordenador mapeando coordenadores mostrando nome. Adicione Select para id_plantao chamando handlePlantaoChange ao mudar mapeando plantoes mostrando nome, e se selectedEmpresa tiver valor mostre abaixo em texto muted-foreground Empresa: seguido do nome.
+
+Se não isCreating renderize view de detalhes apenas leitura mostrando todos os dados da editingEscala formatados em Labels e valores sem inputs editáveis, incluindo nome da pessoa, datas formatadas, telefone, coordenador, plantão, empresa, dias de folga, banco de horas e domingo do mês.
+
+No final do dialog se isCreating renderize DialogFooter com Button variant outline text
+
+ando Cancelar que fecha dialog e Button primary texto Criar Escala que chama handleSubmitEscala.
+
+Configure Supabase client em src/integrations/supabase/client.ts exportando createClient com sua URL e anon key do projeto. Crie schema do banco de dados com tabela escala contendo colunas idescala serial primary key, nomepessoaescala varchar not null, dataescala timestamp not null, finalescala timestamp nullable, telefone varchar nullable, id_coordenador uuid nullable foreign key para coordenador, id_plantao uuid nullable foreign key para plantao, id_contato_terceirizacao uuid nullable foreign key para contatos_terceirizacao, folgas_dias_semana integer array default vazio, banco_horas_datas date array default vazio, folgas_datas date array default vazio, domingo_mes integer nullable e pausa_minutos integer nullable.
+
+Crie tabela coordenador com id_coordenador uuid primary key default gen_random_uuid, nome text not null e telefone numeric nullable. Crie tabela empresa com id_empresa uuid primary key default gen_random_uuid e nome text not null. Crie tabela plantao com id_plantao uuid primary key default gen_random_uuid, nome text not null e id_empresa uuid not null foreign key para empresa. Crie tabela contatos_terceirizacao com id uuid primary key default gen_random_uuid, name text not null, phone text nullable, email text not null, role text not null, notes text nullable, status text default active not null, created_at timestamptz default now not null e updated_at timestamptz default now not null.
+
+Habilite Row Level Security nas tabelas permitindo select insert update delete para todos os usuários sem autenticação para fins de demonstração. Configure index em dataescala para melhor performance de queries ordenadas.
+
+Estilize a aplicação usando Tailwind CSS configurando no tailwind.config.ts o tema com cores HSL usando variáveis CSS do shadcn, fonte sans usando Inter ou system-ui, borderRadius com variável radius. No index.css defina variáveis CSS para light e dark mode incluindo background, foreground, card, card-foreground, popover, popover-foreground, primary, primary-foreground, secondary, secondary-foreground, muted, muted-foreground, accent, accent-foreground, destructive, destructive-foreground, border, input e ring usando valores HSL apropriados.
+
+Implemente dark mode usando next-themes provider envolvendo toda aplicação com ThemeProvider no main.tsx com atributo class, defaultTheme system e enableSystem true. Use className nos componentes respeitando as variáveis de tema bg-background, text-foreground, bg-card, text-card-foreground, bg-muted, text-muted-foreground, border-border etc para garantir funcionamento em ambos os modos.
+
+Configure react-phone-number-input criando arquivo phone-input.css customizando estilos do componente para integrar com shadcn usando mesmas variáveis de cor, border-radius e spacing. Importe esse CSS no Escalas.tsx após importar o CSS padrão da biblioteca.
+
+Use toast do sonner através do hook useToast customizado que deve estar em src/hooks/use-toast.ts exportando useToast e toast functions, toast deve aceitar objeto com title string, description string opcional e variant opcional podendo ser default ou destructive, exibindo mensagens estilizadas conforme tema.
+
+Implemente componentes shadcn em src/components/ui incluindo button.tsx usando cva para variants default, destructive, outline, secondary, ghost, link com sizes default, sm, lg, icon, input.tsx com className combinando border-input bg-background, label.tsx usando radix-ui label primitive, select.tsx usando radix-ui select primitive, textarea.tsx similar ao input, card.tsx exportando Card CardHeader CardTitle CardContent CardFooter, badge.tsx com variants default, secondary, destructive, outline, dialog.tsx usando radix-ui dialog primitive com overlay animado e content centralizado, dropdown-menu.tsx usando radix-ui dropdown-menu primitive.
+
+Use lucide-react para todos os ícones incluindo Search, Filter, MoreHorizontal, Edit, Calendar, Clock, Users, Plus importando e usando como componentes React com className para tamanho como h-4 w-4 ou h-5 w-5. Configure date-fns para formatação de datas importando apenas funções necessárias como format, parseISO, differenceInHours, differenceInMinutes.
+
+A aplicação deve ser totalmente responsiva usando breakpoints do Tailwind sm md lg xl, em mobile empilhar elementos verticalmente com botões full width, em desktop usar layouts flex e grid apropriados. Garanta acessibilidade usando labels apropriados, aria-labels quando necessário, foco visível em todos elementos interativos e suporte a navegação por teclado.
+Lovable
+11:50 AM on Oct 15
+
+Thought for 24 seconds
+Vou criar a página de Escalas dentro do menu Escalas com toda a interface descrita, focando na parte visual.
+
+Show all
+6 edits made
+Página de Escalas criada com interface completa incluindo listagem de cards, busca, dialog de criação/visualização com todos os campos solicitados e integração no menu Escalas.
+
+
+Restore
+
+Code
+
+Add Escalas submenu
+Preview
+
+
+
+
+Fix these issues
+Show more
+Lovable
+11:51 AM on Oct 15
+
+Thought for 9 seconds
+Vou corrigir o erro. O problema está no componente Select onde usei value="" (string vazia), que não é permitido pelo Radix UI.
+
+Edited
+EscalaDialog.tsx
+Erro corrigido! Alterei o valor vazio value="" para value="none" no SelectItem "Nenhum" do campo "Domingo do Mês", pois o Radix UI não permite valores vazios em SelectItem.
+
+
+Restore
+
+Code
+
+Fix: Ensure Select.Item has a value prop
+Preview
+
+
+
+
+
+davi.silva@aresgroup.com.br
+div
+tire a borda dessa div
+Lovable
+11:52 AM on Oct 15
+
+Show all
+1 edit made
+Borda removida!
+
+
+Restore
+
+Code
+
+Remove border from div
+Preview
+
+
+
+
+
+davi.silva@aresgroup.com.br
+acima dos filtros na aba /impostos é necessario que tenha o icone de filtro azul escrito filtro do lado, igual nas demais telas
+Lovable
+11:54 AM on Oct 15
+
+Show all
+1 edit made
+Ícone de filtro azul adicionado ao lado do texto "Filtros"!
+
+
+Restore
+
+Code
+
+Add filter icon to Impostos page
+Preview
+
+
+
+
+
+davi.silva@aresgroup.com.br
+todos os icones de lixeira devem ficar pretos
+Lovable
+11:55 AM on Oct 15
+
+Show all
+1 edit made
+Ícones de lixeira alterados para preto usando text-foreground!
+
+
+Restore
+
+Code
+
+Fix: Change trash icon color
+Preview
+
+
+
+
+
+davi.silva@aresgroup.com.br
+os icones de lixeira de orçamento e projetos tambem devem ser pretos
+Lovable
+11:56 AM on Oct 15
+
+Show all
+2 edits made
+Ícones de lixeira alterados para preto em Orçamentos e Projetos!
+
+
+Restore
+
+Code
+
+Fix trash icons color
+Preview
+
+
+
+
+
+Restore
+
+Code
+
+Visual edit in Lovable
+Preview
+
+
+davi.silva@aresgroup.com.br
+div
+este icone esta pequeno, ele deve ficar do mesmo tamanho que os das demais telas
+Lovable
+11:57 AM on Oct 15
+
+Thought for 10 seconds
+Vou verificar o tamanho dos ícones de filtro nas outras telas e ajustar.
+
+Searched for
+Filter className.*text-primary
+Vou ajustar o ícone para h-5 w-5 para ficar igual às outras telas.
+
+Edited
+Impostos.tsx
+Ícone ajustado para h-5 w-5, agora está do mesmo tamanho das outras telas.
+
+
+Restore
+
+Code
+
+Fix: Adjust icon size
+Preview
+
+
+
+
+[Nota: Intranet - Módulo Escala - Escalas]
+
+[Nota: Onde]
+Dentro do menu chamado Escalas,no subitem chamado Escalas ataulize a página seguindo o padrão visual dos demais módulos utilizando shadcn/ui. 
+
+[Nota: O que]
+Apresentar a tabela de listagem das escalas com as colunas “Nome”, “Data/Hora de Inicio”, Data/Hora de Término e “Ações”, todas ordenáveis; o título da coluna “Ações” deve ficar centralizado e alinhado visualmente entre os ícones e, na própria coluna, exibir diretamente os ícones de Visualizar, Editar e Excluir (sem menu de três pontos).
+A listagem deve reagir a changes em filters, search e sort providos por useTableFilters e atualizar automaticamente após criar, editar ou excluir; utilizar consistentemente componentes shadcn/ui, integrar os date range pickers de criação/atualização ao useTableFilters, exibir toasts e loaders para criar, editar, excluir e enviar mensagem e garantir acessibilidade com foco de teclado e aria-labels nos controles e ícones de ação.A página deve exibir um botão “Novo Tipo de Contato”.
+
+[Nota: Ordenação]
+A ordenação deve usar o estado sort de useTableFilters, com ícone de ordenação ao lado do título da coluna, alternando entre crescente e decrescente ao clicar e atualiza o estado.
+
+[Nota: Filtros]
+Acima da tabela, incluir um container TableFilters controlado pelos hooks useTableFilters e useFilterOptions; dentro dele, um TableSearchInput que faz busca geral em nome/descrição e filtra automaticamente enquanto o usuário digita, sem botão de aplicar; logo abaixo, renderizar os chips dos filtros ativos expostos por useTableFilters (por exemplo, “Técnico ×”, “Ana Costa ×”, intervalos de datas), cada chip removível individualmente; oferecer ação “Limpar tudo” integrada ao estado de useTableFilters; quaisquer filtros adicionais — como Data de Criação e Data de Atualização — devem ser registrados em useTableFilters e expostos no TableFilters por meio de date range pickers, refletindo nos chips, e toda aplicação ou remoção de filtro deve atualizar instantaneamente a listagem. Deve ter um filtro para pesquisar a data de inicio da escala e data de fim da escala, filtros de select para Coordenador e Plantão.
+
+[Nota: Abas das opções criar, editar e visualizar]
+Ao criar, editar ou visualizar será aberto um pop-up reutilizável com as seções citadas abaixo.
+
+[Nota: Aba Dados] 
+Na secção “Dados”,  deve incluir todos os campos do atual formulário, todos obrigatórios.
+
+[Nota: Aba sistema]
+Na aba "Sistema" que exibe uma timeline técnica dinâmica com histórico do registro em ordem cronológica (mais recentes primeiro) dentro de um ScrollArea de 400px de altura. Cada evento deve ter: coluna esquerda com ícone circular de 40x40px (w-10 h-10) sobre fundo azul semi-transparente (bg-primary/10) e ícone azul (text-primary) de 20px (w-5 h-5) do lucide-react, conectados por linha vertical cinza (bg-border) de 1px que para no último item; coluna direita com título do evento em negrito (font-semibold text-sm), linha de metadados com micro-ícone UserRound (w-3.5 h-3.5) + nome do usuário e micro-ícone CalendarClock + timestamp formatado em português "dd/MM/yyyy 'às' HH:mm" usando date-fns e locale ptBR, tudo em text-xs text-muted-foreground, separados por border-b exceto o último item. Mapeie os tipos de evento para ícones: "created" usa CirclePlus, "edited" usa PencilLine, "marked" usa Tag, "deleted" usa Trash2, "restored" usa RotateCcw, todos com a mesma cor azul (text-primary e bg-primary/10). A interface TimelineEvent deve ter id (string), type (union dos 5 tipos), user (string), timestamp (Date) e description (string). O componente Timeline recebe array de events, ordena por timestamp decrescente e renderiza cada TimelineItem passando a prop isLast para o último elemento controlar a linha vertical.
+
+[Nota: Aba Mensagens]
+Na aba “Mensagens”, crie um sistema de chat colaborativo moderno usando React, TypeScript, Tailwind CSS e componentes Shadcn/UI com as seguintes especificações:
+
+*ESTRUTURA DE COMPONENTES:*
+
+1. *Componente Principal (ChatColaborativo.tsx)*
+   - Gerencia estado de mensagens e participantes
+   - Props: recordTitle (título do registro), recordId (ID do registro)
+   - Estado inicial com 4 participantes mockados com avatares do DiceBear
+   - Mensagens iniciais demonstrando funcionalidades de menção
+   - Layout: Container flex vertical sem scroll, distribuindo espaço entre título fixo, área de mensagens com scroll, e input fixo
+
+2. *Lista de Mensagens (MessageList.tsx)*
+   - ScrollArea com padding adequado
+   - Mensagens alinhadas à esquerda (outros) e direita (usuário atual)
+   - Cada mensagem contém:
+     * Avatar circular (40x40px)
+     * Nome do autor em negrito
+     * Timestamp formatado em português (Hoje às HH:mm, Ontem às HH:mm, ou DD/MM/YYYY às HH:mm)
+     * Bolha de mensagem com bordas arredondadas
+     * Conteúdo com suporte a menções destacadas
+   - Mensagens do usuário: fundo azul vibrante, texto branco
+   - Mensagens de outros: fundo cinza claro (muted), texto escuro
+   - Menções (@nome) destacadas com fundo semi-transparente da cor primary
+
+3. *Input de Mensagens (MessageInput.tsx)*
+   - Textarea expansível com altura mínima de 80px
+   - Placeholder: "Digite sua mensagem... Use @ para mencionar alguém"
+   - Botão de envio azul com ícone Send do Lucide
+   - Sistema de menções com @:
+     * Detecta @ digitado e abre popover de sugestões acima do input
+     * Filtra participantes conforme texto digitado após @
+     * Popover mostra avatar, nome e cargo
+     * Ao clicar, insere menção completa no texto
+     * Fecha automaticamente após seleção
+   - Hint: "Pressione Enter para enviar, Shift+Enter para nova linha"
+   - Validação de menções ao enviar (apenas usuários válidos)
+
+*DESIGN SYSTEM (CSS Variables):*
+
+```css
+--primary: 217 83% 58%; /* Azul vibrante para mensagens enviadas */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;  /* Cinza claro para mensagens recebidas */
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+[Nota: Final]
+Lovable
+12:00 PM on Oct 15
+
+Thought for 11 seconds
+Vou atualizar a página de Escalas seguindo o padrão visual dos demais módulos com filtros, ordenação, e dialog com abas (Dados, Sistema, Mensagens).
+
+Show all
+2 tools used
+Agora vou criar os componentes necessários e atualizar a página de Escalas seguindo o padrão estabelecido:
+
+Show all
+5 edits made
+Preciso verificar e atualizar o hook useTableFilters para incluir os novos filtros:
+
+Read
+useTableFilters.tsx
+Agora vou atualizar o hook e a página de Escalas para usar os filtros corretos:
+
+Edited
+useTableFilters.tsx
+Página de Escalas atualizada com sucesso seguindo o padrão visual shadcn/ui, incluindo tabela com filtros, ordenação, ações com ícones e dialog com abas (Dados, Sistema com Timeline e Mensagens com Chat Colaborativo).
+
+
+Restore
+
+Code
+
+Refactor Escalas page
+Preview
+
+
+
+
+
+davi.silva@aresgroup.com.br
+na tela /orcamentos deve ser contado tambem uma coluna contendo a informação de qual/se o orçamento em questão esta submetido a algum imposto, e ao criar ou editar um orçamento deve aparecer tambem o campo de imposto para selecionar alguma da opção de imposto já existente na tela /impostos
+Lovable
+12:02 PM on Oct 15
+
+Thought for 7 seconds
+Vou adicionar a coluna de impostos na tabela de orçamentos e o campo de seleção no formulário.
+
+Show all
+4 tools used
+Agora vou adicionar o campo de imposto na interface e nos componentes:
+
+Show all
+2 edits made
+Agora vou adicionar o campo de seleção de imposto no formulário, logo após o campo de status:
+
+Edited
+OrcamentoDialog.tsx
+Coluna de impostos e campo de seleção adicionados com sucesso na tela de orçamentos.
+
+
+Restore
+
+Code
+
+feat: Add tax information to budgets
+Preview
+
+
+
+
+em /escalas adicione filtros para pesquisar por data de inicio e data de fim da escala
+Lovable
+12:04 PM on Oct 15
+
+Thought for 8 seconds
+Vou adicionar os filtros de data de início e data de fim na página de Escalas.
+
+Show all
+1 edit made
+Agora vou atualizar o hook useTableFilters para adicionar chips para os filtros de data:
+
+Edited
+useTableFilters.tsx
+Filtros de data de início e data de fim adicionados com sucesso na página de Escalas, com calendários de range picker e chips de filtros ativos.
+
+
+Restore
+
+Code
+
+feat: Add date filters to Escalas page
+Preview
+
+
+
+
+
+alinhe os filtros de /escalas, veja na imagem anexada como estão desorganizados
+Lovable
+12:07 PM on Oct 15
+
+Thought for 18 seconds
+Vou ajustar o alinhamento dos filtros, adicionando labels consistentes para todos os campos.
+
+Show all
+2 edits made
+Filtros de Escalas alinhados com labels consistentes em todos os campos.
+
+
+Restore
+
+Code
+
+Align filters on Escalas page
+Preview
+
+
+
+
+[Onde]
+
+Dentro do menu "Escalas", crie uma página chamada "Visão Calendário".
+
+[Contexto]
+
+
+Preciso que você crie uma tela de calendário para gestão de escalas de trabalho com visualizações diária, semanal, mensal e anual. A aplicação usa React 18 com TypeScript, Vite como bundler, Tailwind CSS para estilização, Shadcn UI para componentes, Supabase como backend, date-fns versão 4 para manipulação de datas com locale pt-BR, e Lucide React para ícones. O projeto já está configurado com todas essas dependências instaladas.
+
+A estrutura de arquivos deve incluir src/pages/Calendario.tsx como página principal que apenas renderiza o componente TeamManagement, src/types/calendar.ts para as interfaces TypeScript, src/hooks/useEscalas.tsx para lógica de busca e transformação de dados, e dentro de src/components/calendar os seguintes componentes: TeamManagement.tsx (componente principal), DailyView.tsx, CalendarGrid.tsx (para visões semanal e mensal), MonthlyView.tsx, YearlyView.tsx, QuadrantCell.tsx, CalendarNavigation.tsx, CalendarViewTabs.tsx, e SelectedChipsBar.tsx.
+
+No arquivo src/types/calendar.ts defina as seguintes interfaces. A interface Employee com campos id (string), name (string), position (string), avatar opcional (string), department (string), weeklyHours (number), workedHours (number) e expectedHours (number). A interface Schedule com id (string), employeeId (string), date (Date), startTime (string), endTime (string), type que pode ser work, break, rest ou vacation, location opcional (string) e isDomingoMes opcional (boolean). Crie um tipo ViewType que pode ser daily, weekly, monthly ou yearly. Crie um tipo FilterType que pode ser Terceirizados, Coordenadores, Plantões ou Empresas. A interface QuadrantData deve ter presenca (number), atraso (number), falta (number), faltaJustificada (number), atestado (number), e opcionalmente presencaHoras, atrasoHoras, faltaHoras, faltaJustificadaHoras e atestadoHoras todos como number. A interface AggregatedEntity deve ter id (string), name (string) e type (FilterType). A interface EntityQuadrantData estende AggregatedEntity e adiciona quadrants que é um Map com chave string no formato YYYY-MM-DD e valor QuadrantData.
+
+O hook useEscalas.tsx deve ser exportado como default e retornar um objeto com employees (Employee array), schedules (Schedule array), aggregatedEntities (EntityQuadrantData array), loading (boolean), error (string ou null), refetch (função), setAggregatedEntities e fetchAggregatedData (função assíncrona). Internamente o hook usa useState para gerenciar esses estados e useEffect para carregar dados inicialmente. A função fetchEscalas deve buscar dados das tabelas escala, coordenador, plantao e empresa do Supabase usando joins apropriados. Para cada registro da tabela escala, crie um objeto Employee com id sendo o idescala convertido para string, name sendo nomepessoaescala, position determinado pelo tipo (coordenador.nome, plantao.nome ou empresa.nome), department sendo Coordenadores se tem id_coordenador, Plantões se tem id_plantao, ou Terceirizados caso contrário, weeklyHours calculado da diferença entre finalescala e dataescala, workedHours e expectedHours zerados inicialmente. Para cada escala crie múltiplos objetos Schedule. Primeiro crie um schedule principal do tipo work com date sendo dataescala, startTime formatado como HH:mm da dataescala, endTime formatado como HH:mm da finalescala. Se o campo folgas_dias_semana existir e for um array, para cada dia da semana entre dataescala e finalescala que coincida com os números do array (0=domingo, 1=segunda etc), crie um schedule tipo rest. Se folgas_datas existir e for array de datas, crie schedules tipo rest para cada data. Se banco_horas_datas existir, crie schedules tipo break para cada data. Se domingo_mes for um número entre 1 e 5, calcule o enésimo domingo do mês da dataescala e crie um schedule tipo vacation com isDomingoMes true para essa data.
+
+A função fetchAggregatedData deve receber filterType (string que pode ser Coordenadores, Plantões ou Empresas), startDate e endDate como Date. Ela deve chamar a função RPC do Supabase chamada get_quadrant_counts_with_hours passando p_filter como filterType, p_start e p_end como datas formatadas em YYYY-MM-DD. Se essa chamada falhar, tente chamar get_quadrant_counts como fallback sem horas. O retorno deve ser transformado em array de EntityQuadrantData onde cada entidade tem seu Map de quadrants populado com as datas e dados retornados. Os campos presenca devem vir do campo presenca do retorno, atraso do campo atraso, falta do campo falta, faltaJustificada e atestado somados do campo fj_at, e os campos de horas correspondentes se existirem no retorno.
+
+O componente TeamManagement.tsx é o componente principal que gerencia todo o estado e layout. Use useState para currentDate inicializado com new Date, viewType inicializado como monthly, selectedDepartments como array de strings inicialmente vazio, searchTerm como string vazia, aggregatedEntities como array vazio, loadingAggregated como false, isMonochrome como false e displayMode como absolute. Defina departments como array contendo Terceirizados, Coordenadores, Plantões e Empresas. Use useEscalas para obter employees, schedules, loading e error. Use useRef para topScrollRef e mainScrollRef para sincronização de scroll horizontal. Use useEffect para sincronizar o scroll entre topScrollRef e mainScrollRef ouvindo eventos de scroll. Outro useEffect deve chamar fetchAggregatedData sempre que selectedDepartments, currentDate ou viewType mudarem, mas apenas se selectedDepartments tiver exatamente um elemento diferente de Terceirizados.
+
+A função handleNavigate deve receber prev ou next e atualizar currentDate somando ou subtraindo baseado no viewType: para daily adiciona/subtrai 1 dia, para weekly 7 dias, para monthly 1 mês usando addMonths ou subMonths do date-fns, para yearly 1 ano. A função handleDepartmentFilter deve adicionar ou remover departamentos do selectedDepartments. Se o departamento clicado não é Terceirizados e não está selecionado, limpe selectedDepartments e adicione apenas ele. Se já está selecionado, remova. Se for Terceirizados, limpe o array. Filtre escalasEmployees e aggregatedEntities pelo searchTerm buscando no campo name.
+
+O layout deve ter um container flex column com gap-4 e padding. No topo renderize CalendarNavigation passando currentDate, onNavigate e viewType. Logo abaixo CalendarViewTabs com viewType e onViewChange. Depois uma seção flex com input de busca, Select para selectedDepartments com opção múltipla, e toggles para isMonochrome e displayMode. Renderize SelectedChipsBar para mostrar chips dos departamentos selecionados. Implemente dois divs com overflow-x-auto, o primeiro (topScrollRef) sendo uma barra de scroll vazia com altura 12px e largura igual ao conteúdo do calendário, e o segundo (mainScrollRef) contendo o calendário real. Baseado no viewType renderize DailyView se daily, CalendarGrid se weekly, MonthlyView se monthly ou YearlyView se yearly, passando as props apropriadas incluindo employees, schedules, currentDate, selectedDepartments, isQuadrantMode (true se selectedDepartments tem 1 elemento e não é Terceirizados), isMonochrome, displayMode e aggregatedEntities.
+
+O componente QuadrantCell deve receber data (QuadrantData), className opcional, isMonochrome default false, displayMode default absolute e compact default false. Calcule o total somando presenca, atraso, falta, faltaJustificada e atestado. Defina um array quadrants com 4 objetos: primeiro para Presença com value sendo data.presenca, label P, color sendo bg-gray-100 text-gray-800 se monochrome ou bg-green-100 text-green-800; segundo para Atraso com data.atraso, label A, cores gray ou yellow; terceiro para Falta Justificada com data.faltaJustificada, label FJ, cores gray ou blue; quarto para Falta Injustificada somando data.falta mais data.atestado, label FI, cores gray ou red. A função getDisplayValue deve retornar porcentagem se displayMode for percentage calculando value/total vezes 100 e adicionando símbolo %, horas se displayMode for hours usando o parâmetro hours ou value vezes 8 como fallback, ou o value absoluto. Renderize um grid grid-cols-2 gap-px com altura mínima de 55px se compact ou 70px sm:80px. Para cada quadrante renderize uma div flex flex-col items-center justify-center com padding condicional, aplicando a cor apropriada e rounded-sm. Dentro mostre o valor retornado por getDisplayValue em fonte bold com tamanho condicional (text-xs se compact, text-sm sm:text-base md:text-lg) e abaixo o label em fonte medium com tamanho menor.
+
+O componente CalendarNavigation recebe currentDate, onNavigate e viewType. Defina getDateFormat que retorna string formatada usando format do date-fns com locale ptBR: para daily formato completo com dia da semana, para weekly mostra Semana de, para monthly apenas mês e ano, para yearly apenas ano. Renderize div flex items-center gap-2 w-full contendo Button variant outline size sm chamando onNavigate com prev, h2 centralizado mostrando getDateFormat, e Button para next.
+
+O componente CalendarViewTabs recebe viewType e onViewChange. Use Tabs do shadcn com value sendo viewType e onValueChange chamando onViewChange convertendo para ViewType. Dentro TabsList com grid-cols-4 height 10 e quatro TabsTrigger para daily (Dia), weekly (Semana), monthly (Mês) e yearly (Ano), todos com className calendar-tab.
+
+DailyView recebe currentDate, employees, schedules, selectedDepartments, isQuadrantMode, aggregatedEntities, isMonochrome e displayMode. Filtre employees pelos selectedDepartments. Defina getScheduleForEmployee que busca schedule para employee e hour específicos. Defina getScheduleColor retornando classes do tailwind baseado no tipo: rest retorna bg-blue-50 border-blue-200, break retorna bg-orange-50 border-orange-200, vacation retorna bg-purple-50 border-purple-200, padrão bg-white border-gray-200. Defina getScheduleDisplay retornando Folga para rest, Banco de Horas para break, Domingo do Mês para vacation com isDomingoMes, ou o horário startTime - endTime. Defina isWorkingHour verificando se há schedule naquele horário. Se isQuadrantMode renderize grid com coluna fixa para o nome da entidade e coluna para o quadrante, iterando aggregatedEntities e renderizando QuadrantCell para cada um com os dados de currentDate formatado como YYYY-MM-DD. Caso contrário renderize grid tradicional com linha de header mostrando Select para departamento e horas de 0 a 23, e linhas para cada employee mostrando Avatar, nome e células por hora com schedule ou placeholder.
+
+CalendarGrid é similar mas para visão semanal (7 dias) ou mensal (até 31 dias dependendo do mês). Use isSameDay, startOfWeek, endOfWeek, eachDayOfInterval do date-fns para calcular dateRange. Renderize header com datas formatadas e rows para employees ou aggregatedEntities se isQuadrantMode.
+
+MonthlyView calcula todos os dias do mês usando getDaysInMonth, startOfMonth e cria array com cada dia. Renderize grid tipo calendário com 7 colunas (dias da semana) mostrando header com Dom, Seg, Ter, Qua, Qui, Sex, Sab. Para cada employee renderize linha com Avatar e nome, depois células para cada dia do mês mostrando schedule indicator (círculo colorido ou ícone) ou QuadrantCell se isQuadrantMode. Use getDayClass para aplicar classes condicionais: opacity reduzida para dias passados, background highlight para hoje, cinza para dias fora do mês atual.
+
+YearlyView calcula todas as semanas do ano agrupadas por mês. Renderize header com colunas para cada mês e suas semanas. Para cada employee renderize linha mostrando total anual de horas e breakdown por semana, ou QuadrantCell agregado se isQuadrantMode.
+
+SelectedChipsBar recebe selectedDepartments, onRemoveDepartment e onClearAll. Se array vazio retorne null. Renderize div flex items-center gap-2 flex-wrap com texto Filtros ativos, Badge para cada departamento com botão X que chama onRemoveDepartment, e Button Limpar todos chamando onClearAll.
+
+No arquivo src/index.css adicione variáveis CSS para --row-h com valores responsivos (56px default, 60px em sm, 64px em md), --col-fixed como 180px padrão e 200px em lg, variáveis de cores para schedules como --schedule-diurno, --schedule-noturno etc usando valores HSL. Defina classes utilitárias calendar-container, calendar-header, calendar-main, calendar-grid-base, calendar-grid-daily, calendar-grid-weekly, calendar-grid-monthly, calendar-grid-yearly com propriedades de grid, overflow, sticky positioning. A primeira coluna deve ter position sticky left-0 com z-index alto. Header deve ter position sticky top-0.
+
+Configure Supabase com as tabelas: escala (campos idescala integer PK, nomepessoaescala varchar, dataescala timestamp, finalescala timestamp, telefone varchar, id_coordenador uuid FK, id_plantao uuid FK, id_contato_terceirizacao uuid FK, folgas_dias_semana integer array, folgas_datas date array, banco_horas_dias_semana integer array, banco_horas_datas date array, domingo_mes integer, pausa_minutos integer); coordenador (id_coordenador uuid PK, nome text, telefone numeric); plantao (id_plantao uuid PK, nome text, id_empresa uuid FK); empresa (id_empresa uuid PK, nome text). Crie função RPC get_quadrant_counts_with_hours que recebe p_filter text, p_start date, p_end date e retorna TABLE com entity_id uuid, entity_name text, dt date, presenca int, atraso int, falta int, fj_at int, presenca_horas numeric, atraso_horas numeric, falta_horas numeric, fj_at_horas numeric. A função deve fazer joins entre escala e resposta_comunicacao agrupando por entidade (coordenador, plantao ou empresa dependendo do p_filter) e data, contando ocorrências onde status é 1 para presenca, 2 para atraso, 3 para falta, 4 ou 5 para fj_at, e somando horas calculadas da diferença entre finalescala e dataescala multiplicando por EXTRACT EPOCH dividido por 3600.
+
+Use client do Supabase importado de src/integrations/supabase/client.ts que já está configurado com createClient usando a URL e chave anon do projeto. Todas as chamadas devem usar await supabase.from ou supabase.rpc com tratamento de erro verificando error do retorno.
+
+Implemente sincronização de scroll horizontal entre a barra superior (topScrollRef) e o conteúdo do calendário (mainScrollRef) ouvindo scrollLeft de um e aplicando no outro bidi
+
+recionalmente. Use ResizeObserver para ajustar largura da barra superior quando o conteúdo muda. Para calcular o enésimo domingo do mês, use getDay, startOfMonth e addDays do date-fns iterando semanas até encontrar o domingo correto.
+
+Todo o design deve seguir o design system do Tailwind com variáveis HSL definidas em index.css para cores, usando classes semânticas ao invés de cores diretas. Componentes shadcn já configurados incluem Button, Card, Select, Input, Badge, Tabs, Avatar, Skeleton, DropdownMenu, Dialog, Popover e Calendar. Use Skeleton components para estados de loading. Mensagens de erro devem usar Alert do shadcn. Toda a interface deve ser responsiva com breakpoints sm, md, lg, xl usando classes do Tailwind. Textos devem ser concisos e em português brasileiro. Ícones do lucide-react incluem ChevronLeft, ChevronRight, Search, Filter, Calendar, Clock, Users e mais conforme necessário.
