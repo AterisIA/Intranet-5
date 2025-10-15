@@ -1,0 +1,39 @@
+[Nota: Onde]
+Dentro do menu Escala crie um subitem chamado "Relatório de Presença".
+
+[Nota: Contexto]
+Esse prompt é de uma tela já criada em outro projeto, preciso que você a partir dele a recrie com perfeição mas impondo os padrões visuais do atual sistema. Ignore tudo sobre banco de dados, no momento o foco é criação visual da pagina.
+
+Tecnologias Core: Crie uma aplicação React 18 com TypeScript, Vite, Tailwind CSS e Shadcn UI. Use Lucide React versão 0.462.0 para ícones. Configure Tailwind CSS com suporte a dark mode via classe CSS. A aplicação deve ser standalone, sem autenticação.
+
+Estrutura de Arquivos: Crie o arquivo principal src/pages/Relatorio.tsx que será a tela de relatório de presença. Crie src/index.css para estilos globais. Crie src/components/ui para componentes Shadcn (Card, CardContent, CardHeader, CardTitle, Badge, Progress). Configure tailwind.config.ts com as customizações necessárias.
+
+Interfaces TypeScript no Relatorio.tsx: Defina DashboardMetric com campos: title (string), value (string), change (string), changeType ("positive" | "negative" | "neutral"), icon (React.ElementType). Defina AttendanceData com: role (string), present (number), total (number), percentage (number). Defina RecentActivity com: id (string), person (string), action (string), time (string), status ("success" | "warning" | "error").
+
+Dados Mockados: Crie um array metrics com 4 métricas: "Total de Funcionários" (valor "8", change "+2 este mês", tipo positive, ícone Users), "Presença Hoje" (valor "75%", change "6 de 8 presentes", tipo neutral, ícone CheckCircle), "Horas Trabalhadas" (valor "32h", change "+4h vs ontem", tipo positive, ícone Clock), "Alertas Pendentes" (valor "3", change "2 críticos", tipo negative, ícone AlertTriangle). Crie array attendanceData com 2 itens: Limpeza (3 presentes de 4 total, 75%) e Recepção (3 de 4, 75%). Crie array recentActivities com 3 atividades: Maria Silva (Check-in realizado, 08:00, success), João Santos (Chegada atrasada, 08:15, warning), Ana Costa (Falta não justificada, 08:00, error).
+
+Componente Principal Relatorio.tsx: Crie função getChangeColor que retorna "text-green-600" para positive, "text-red-600" para negative, "text-muted-foreground" para neutral. Crie função getActivityColor que retorna "bg-green-100 text-green-800" para success, "bg-yellow-100 text-yellow-800" para warning, "bg-red-100 text-red-800" para error, "bg-gray-100 text-gray-800" como fallback. O componente renderiza um div com padding p-8 e espaçamento space-y-6.
+
+Layout da Tela: Header com título "Relatório de Presença" (text-3xl font-bold text-foreground), subtítulo mostrando data atual formatada em pt-BR (text-muted-foreground mt-1), e Badge "Apenas Visualização" (variant secondary, text-xs) alinhado à direita. Grid de métricas principais com grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6. Cada Card de métrica mostra título (text-sm font-medium text-muted-foreground), valor (text-2xl font-bold text-foreground), mudança com cor dinâmica (text-xs), e ícone em círculo (h-12 w-12 rounded-full bg-primary/10 com ícone h-6 w-6 text-primary).
+
+Seção Presença por Função: Grid com grid-cols-1 lg:grid-cols-2 gap-6. Card com CardHeader contendo Users icon (h-5 w-5) e título "Presença por Função". CardContent com space-y-4. Cada item mostra role e "present/total" na primeira linha (flex justify-between), Progress component (value={percentage}, className="h-2"), e texto "{percentage}% de presença" (text-xs text-muted-foreground).
+
+Seção Atividades Recentes: Card com Calendar icon e título "Atividades Recentes". Cada atividade renderiza div com flex items-center gap-3: círculo decorativo (h-2 w-2 rounded-full bg-primary), nome da pessoa (text-sm font-medium), ação (text-xs text-muted-foreground), horário (text-xs text-muted-foreground), e Badge com status (variant outline, classes dinâmicas baseadas no status, texto "OK"/"Atenção"/"Erro").
+
+Seção Resumo do Dia: Card full-width com CardTitle "Resumo do Dia". Grid com grid-cols-1 md:grid-cols-3 gap-6, cada célula com text-center: valor grande (text-2xl font-bold) com cores específicas (text-green-600 para "6" Funcionários Presentes, text-red-600 para "2" Faltas, text-yellow-600 para "1" Atrasos), e descrição (text-sm text-muted-foreground).
+
+Estilização com Tailwind (index.css): Defina variáveis CSS customizadas em :root e .dark para todo o sistema de design. Use HSL para todas as cores: --background, --foreground, --card, --card-foreground, --popover, --popover-foreground, --primary, --primary-foreground, --secondary, --secondary-foreground, --muted, --muted-foreground, --accent, --accent-foreground, --destructive, --destructive-foreground, --border, --input, --ring. Configure font-family: Inter (sans-serif). Adicione estilos base: body com bg-background text-foreground, * com border-color: hsl(var(--border)).
+
+Componentes Shadcn UI Necessários: Card (div com rounded-xl border bg-card text-card-foreground shadow), CardHeader (flex flex-col space-y-1.5 p-6), CardTitle (font-semibold leading-none tracking-tight), CardContent (p-6 pt-0). Badge (inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors), com variants: default (border-transparent bg-primary text-primary-foreground hover:bg-primary/80), secondary (border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80), outline (text-foreground). Progress (relative h-2 w-full overflow-hidden rounded-full bg-primary/20), com ProgressIndicator (h-full w-full flex-1 bg-primary transition-all).
+
+Ícones Lucide React: Importe Users, Clock, CheckCircle, AlertTriangle, Calendar de "lucide-react". Use como componentes JSX com props className para tamanho e cor (ex: <Users className="h-6 w-6 text-primary" />).
+
+Tailwind Config: Configure tailwind.config.ts com extend.colors referenciando as variáveis CSS via hsl(var(--{nome})). Configure extend.borderRadius com lg: var(--radius), md: calc(var(--radius) - 2px), sm: calc(var(--radius) - 4px). Defina --radius: 0.5rem no :root. Configure darkMode: "class". Configure content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"].
+
+Formatação de Data: Use new Date().toLocaleDateString("pt-BR") para formatar a data no subtítulo do header.
+
+Responsividade: A interface usa grid responsivo (mobile-first). No mobile: 1 coluna para métricas e seções. No tablet (md): 2 colunas para métricas. No desktop (lg): 4 colunas para métricas, 2 colunas para seções de presença/atividades. Use overflow-auto quando necessário. Todas as fontes e espaçamentos devem escalar proporcionalmente.
+
+Features Especiais: Dark mode suportado via classes CSS (configure provider se necessário). Sistema de cores semântico usando variáveis CSS HSL. Componentes totalmente tipados com TypeScript. Dados estáticos/mockados (sem conexão a banco de dados). Layout responsivo e acessível. Uso de Flexbox e Grid para layouts modernos. Componentes reutilizáveis seguindo padrão Shadcn.
+
+Estrutura Final do Componente: Export default function Relatorio() com: funções utilitárias (getChangeColor, getActivityColor), return com JSX contendo: container div (className="p-8 space-y-6"), header section com título/data/badge, grid de métricas (mapear metrics array), grid de 2 colunas (presença por função + atividades recentes), card de resumo do dia. Todo o conteúdo deve usar componentes Shadcn e classes Tailwind, sem estilos inline.
