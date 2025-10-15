@@ -1,0 +1,242 @@
+[Nota: Intranet - Comercial - Produtos]
+
+[Nota: Onde]
+Na aba /comercial/produtos haverá uma página completa de gerenciamento de produtos, construída em React com TypeScript, Tailwind CSS e Shadcn/UI.
+A página permitirá visualizar, criar, editar e excluir produtos integrados ao Supabase.
+Toda a interface será responsiva, com tabela ordenável, filtros em tempo real e modais reutilizáveis para criação, edição e visualização.
+
+[Nota: Tecnologias Necessárias]
+React 18, TypeScript, Tailwind CSS, Shadcn/UI (Table, Dialog, Button, Input, Select, Label, Card, AlertDialog, ScrollArea), Supabase Client, react-hook-form, zod para validação, lucide-react para ícones (Search, Plus, Eye, Edit, Trash2, X, ArrowUpDown).
+
+[Nota: Estrutura Visual Geral]
+A página deve usar um Card branco principal contendo:
+
+Cabeçalho com título e botão principal.
+
+Área de controles e filtros.
+
+Tabela responsiva com scroll interno e ordenação clicável.
+O layout ocupa toda a altura da tela (h-full) com rolagem apenas na área da tabela.
+
+[Nota: Cabeçalho do Card]
+Título “Produtos” com ícone Package e subtítulo “Gerencie os produtos cadastrados no sistema”.
+À direita, um botão “Novo Produto” com ícone Plus, cor primária e ação de abrir o modal de criação.
+
+[Nota: Área de Controles]
+Logo abaixo do cabeçalho, uma linha com três elementos dispostos em flex gap-4:
+
+Input de busca com ícone Search, placeholder “Buscar por nome, código ou descrição”, flex-1.
+
+Select de filtro de status com opções: “Todos”, “Ativos”, “Inativos”, largura w-48.
+
+Botão “Novo Produto” visível apenas em telas médias ou maiores.
+Os filtros e a busca serão controlados em tempo real, combináveis entre si, sem necessidade de botão “Aplicar”.
+
+[Nota: Tabela de Produtos]
+Abaixo da área de filtros, renderizar uma tabela responsiva com colunas ordenáveis.
+Cada cabeçalho exibirá um ícone ArrowUpDown indicando ordenação crescente/decrescente.
+As colunas obrigatórias são:
+
+Código: campo codigo_produto (auto-gerado, ex: PRD0001, PRD0002).
+
+Nome: campo nome_produto (texto, obrigatório, até 200 caracteres).
+
+Categoria: exibe hierarquia completa “Categoria N1 > Categoria N2 > Categoria N3”.
+
+Fornecedor: campo id_fornecedor, exibe razao_social.
+
+Empresa: campo id_empresa, exibe razao_social.
+
+Valor: campo valor (numérico, formato “R$ 0.000,00”).
+
+Custo: campo custo (numérico, formato “R$ 0.000,00”).
+
+Markup: campo markup (calculado automaticamente como (valor - custo) / custo * 100, formato percentual com 2 casas).
+
+Status: campo ativo (badge verde “Ativo” ou vermelho “Inativo”).
+
+Ações: três ícones: Eye (visualizar), Edit (editar), Trash2 (excluir).
+
+Cada cabeçalho é clicável para ordenar, e a tabela deve combinar filtros + busca + ordenação simultaneamente.
+O estado de ordenação deve refletir visualmente a direção (seta para cima/baixo).
+
+[Nota: Modal de Criação e Edição]
+O botão “Novo Produto” abre um Dialog max-w-4xl com o formulário dividido em seções organizadas.
+A edição usa o mesmo layout, mas com dados preenchidos e campo de status editável.
+Os botões de rodapé são: Cancelar (variant outline) e Salvar (variant default, desativado durante o loading).
+
+Seção 1 — Informações Básicas
+
+Nome do Produto (input obrigatório, máx. 200 caracteres)
+
+Código do Produto (readonly, auto-gerado na criação)
+
+Descrição (textarea opcional, máx. 1000 caracteres)
+
+Status Ativo (checkbox, default true)
+
+Seção 2 — Categorização (grid 3 colunas)
+
+Categoria N1 (select obrigatório, carrega de categorias_n1)
+
+Categoria N2 (select obrigatório, depende da N1, carrega de categorias_n2)
+
+Categoria N3 (select obrigatório, depende da N2, carrega de categorias_n3)
+Cada select só é habilitado após o anterior ser selecionado.
+
+Seção 3 — Relacionamentos (grid 2 colunas)
+
+Fornecedor (select opcional, carrega razao_social de fornecedores)
+
+Empresa (select opcional, carrega razao_social de empresas)
+
+Seção 4 — Precificação (grid 3 colunas)
+
+Custo (number obrigatório, formato R$, mínimo 0)
+
+Valor (number obrigatório, formato R$, mínimo 0, deve ser >= custo)
+
+Markup (readonly, calculado automaticamente, formato %, fórmula (valor - custo) / custo * 100)
+Sempre que custo ou valor forem alterados, recalcular markup automaticamente. Exibir erro se valor < custo.
+
+Seção 5 — Faixas de Custo e Taxas (grid 2 colunas)
+
+Custo Mínimo (number opcional, min 0)
+
+Custo Máximo (number opcional, min 0, deve ser >= custo_minimo)
+
+Taxa Mínima (number opcional, %, min 0, max 100)
+
+Taxa Máxima (number opcional, %, min 0, max 100, deve ser >= taxa_mínima)
+
+Seção 6 — Características Técnicas (grid 2 colunas)
+
+Unidade de Medida (text opcional, ex: UN, KG, M, L)
+
+Peso (number opcional, min 0, sufixo “kg”)
+
+Dimensões (text opcional, placeholder “LxAxP em cm”)
+
+NCM (text opcional, 8 dígitos, formato “0000.00.00”)
+
+Seção 7 — Estoque e Logística (grid 2 colunas)
+
+Quantidade em Estoque (readonly, carregado de tabela estoque)
+
+Quantidade Mínima (number opcional, min 0)
+
+Localização no Estoque (text opcional, ex: “Corredor A, Prateleira 3”)
+
+Código de Barras (text opcional)
+
+SKU (text opcional, identificador interno)
+
+Seção 8 — Informações Complementares
+
+Imagem do Produto (file upload com preview)
+
+Observações (textarea opcional, máx. 2000 caracteres)
+
+Tags (text opcional, separadas por vírgula)
+
+[Nota: Modal de Visualização]
+Abrir Dialog max-w-3xl somente leitura, com os campos apresentados nas mesmas seções e formatação aplicada (valores monetários, datas, badges para status).
+Incluir botão “Fechar” no rodapé.
+
+[Nota: Modal de Exclusão]
+Usar AlertDialog com título “Confirmar Exclusão”, mensagem “Tem certeza que deseja excluir o produto [NOME]? Esta ação não pode ser desfeita.”
+Botões “Cancelar” e “Excluir” (variant destructive).
+Após confirmação, excluir o item e exibir toast “Produto excluído com sucesso”.
+
+[Nota: Funcionalidades de Filtro e Ordenação]
+
+Busca em tempo real por nome, código e descrição.
+
+Filtro de status (Todos, Ativos, Inativos).
+
+Ordenação clicável em todas as colunas.
+
+Combinação de filtros simultâneos (busca + status + ordenação).
+
+Exibir ícones de seta no cabeçalho conforme direção da ordenação.
+
+[Nota: Estados de Loading]
+
+Skeleton na tabela durante o carregamento inicial.
+
+Spinner no botão “Salvar” durante submit.
+
+Inputs desabilitados durante operações em andamento.
+
+[Nota: Validações do Formulário]
+Usar zod e react-hook-form com as seguintes regras:
+
+nome_produto: obrigatório, min 3, max 200 caracteres.
+
+categoria_n1, categoria_n2, categoria_n3: obrigatórios.
+
+valor: obrigatório, min 0.01, deve ser >= custo.
+
+custo: obrigatório, min 0.
+
+custo_maximo: se preenchido, >= custo_minimo.
+
+taxa_maxima: se preenchida, >= taxa_minima.
+
+ncm: se preenchido, 8 dígitos numéricos.
+
+[Nota: Integração com Supabase]
+Tabelas necessárias:
+
+produtos (todos os campos descritos acima)
+
+categorias_n1, categorias_n2, categorias_n3 (id, nome, descricao, relacionamentos hierárquicos)
+
+fornecedores (id, razao_social)
+
+empresas (id, razao_social)
+
+estoque (produto_id, quantidade)
+O cálculo de markup deve ocorrer automaticamente sempre que custo ou valor mudarem.
+markup = ((valor - custo) / custo) * 100, formatado com 2 casas e símbolo “%”.
+
+[Nota: Formatação de Valores]
+
+Moeda: R$ 1.234,56
+
+Porcentagem: 12,34%
+
+Data: dd/MM/yyyy HH:mm
+
+[Nota: Responsividade e Acessibilidade]
+Tabela com scroll horizontal em mobile, modais adaptativos, grids que colapsam para 1 coluna em telas pequenas.
+Todos os inputs devem ter labels associadas, botões de ícone com aria-label, foco visível e mensagens de erro claras.
+
+[Nota: Permissões]
+Verificar permissões:
+
+canReadProdutos: visualizar.
+
+canWriteProdutos: criar e editar.
+
+canAdminProdutos: excluir.
+Botões de ação devem respeitar essas permissões.
+
+[Nota: Notificações]
+Usar toast para mensagens de sucesso e erro em todas as operações (criar, editar, excluir).
+Mensagens:
+
+“Produto criado com sucesso.”
+
+“Produto atualizado com sucesso.”
+
+“Produto excluído com sucesso.”
+
+“Erro ao salvar produto.”
+
+[Nota: Final]
+A página deve seguir rigorosamente o padrão de design e interatividade da intranet Ares: minimalista, profissional, responsiva e coerente entre módulos.
+Todos os campos e seções descritos devem estar presentes.
+A hierarquia de categorias deve funcionar de forma dependente (N2 depende de N1, N3 depende de N2).
+O markup deve ser sempre calculado automaticamente e readonly.
+A tabela deve permitir ordenação em todas as colunas, com comportamento instantâneo e fluido.
