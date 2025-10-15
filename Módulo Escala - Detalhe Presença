@@ -1,0 +1,110 @@
+[Nota: Onde]
+
+Dentro do menu Escalas, crie um subitem chamado de "Detalhe Presença"
+
+[Nota: Contexto]
+Esse é um prompt de uma tela feita em outro projeto, preciso que você recrie com perfeição mas impondo o padrão desse sistema. Ignore aquilo que for de banco de dados, o importante nesse momento é a criação visual da pagina.
+
+[Nota: O que]
+Apresentar a tabela de listagem dos tipos de contato com as colunas “Nome”, “Comunicação”, "Telefone" e “Ações”, todas ordenáveis; o título da coluna “Ações” deve ficar centralizado e alinhado visualmente entre os ícones e, na própria coluna, exibir diretamente os ícones de Visualizar.
+A listagem deve reagir a changes em filters, search e sort providos por useTableFilters e atualizar automaticamente após criar, editar ou excluir; utilizar consistentemente componentes shadcn/ui, integrar os date range pickers de criação/atualização ao useTableFilters, exibir toasts e loaders para criar, editar, excluir e enviar mensagem e garantir acessibilidade com foco de teclado e aria-labels nos controles e ícones de ação.
+
+[Nota: Ordenação]
+A ordenação deve usar o estado sort de useTableFilters, com ícone de ordenação ao lado do título da coluna, alternando entre crescente e decrescente ao clicar e atualiza o estado.
+
+[Nota: Filtros]
+Acima da tabela, incluir um container TableFilters controlado pelos hooks useTableFilters e useFilterOptions; dentro dele, um TableSearchInput que faz busca geral em nome/descrição e filtra automaticamente enquanto o usuário digita, sem botão de aplicar; logo abaixo, renderizar os chips dos filtros ativos expostos por useTableFilters (por exemplo, “Técnico ×”, “Ana Costa ×”, intervalos de datas), cada chip removível individualmente; oferecer ação “Limpar tudo” integrada ao estado de useTableFilters; quaisquer filtros adicionais — como Data de Criação e Data de Atualização — devem ser registrados em useTableFilters e expostos no TableFilters por meio de date range pickers, refletindo nos chips, e toda aplicação ou remoção de filtro deve atualizar instantaneamente a listagem.
+
+[Nota: Aba sistema]
+Na aba "Sistema" que exibe uma timeline técnica dinâmica com histórico do registro em ordem cronológica (mais recentes primeiro) dentro de um ScrollArea de 400px de altura. Cada evento deve ter: coluna esquerda com ícone circular de 40x40px (w-10 h-10) sobre fundo azul semi-transparente (bg-primary/10) e ícone azul (text-primary) de 20px (w-5 h-5) do lucide-react, conectados por linha vertical cinza (bg-border) de 1px que para no último item; coluna direita com título do evento em negrito (font-semibold text-sm), linha de metadados com micro-ícone UserRound (w-3.5 h-3.5) + nome do usuário e micro-ícone CalendarClock + timestamp formatado em português "dd/MM/yyyy 'às' HH:mm" usando date-fns e locale ptBR, tudo em text-xs text-muted-foreground, separados por border-b exceto o último item. Mapeie os tipos de evento para ícones: "created" usa CirclePlus, "edited" usa PencilLine, "marked" usa Tag, "deleted" usa Trash2, "restored" usa RotateCcw, todos com a mesma cor azul (text-primary e bg-primary/10). A interface TimelineEvent deve ter id (string), type (union dos 5 tipos), user (string), timestamp (Date) e description (string). O componente Timeline recebe array de events, ordena por timestamp decrescente e renderiza cada TimelineItem passando a prop isLast para o último elemento controlar a linha vertical.
+
+[Nota: Aba Mensagens]
+Na aba “Mensagens”, crie um sistema de chat colaborativo moderno usando React, TypeScript, Tailwind CSS e componentes Shadcn/UI com as seguintes especificações:
+
+*ESTRUTURA DE COMPONENTES:*
+
+1. *Componente Principal (ChatColaborativo.tsx)*
+   - Gerencia estado de mensagens e participantes
+   - Props: recordTitle (título do registro), recordId (ID do registro)
+   - Estado inicial com 4 participantes mockados com avatares do DiceBear
+   - Mensagens iniciais demonstrando funcionalidades de menção
+   - Layout: Container flex vertical sem scroll, distribuindo espaço entre título fixo, área de mensagens com scroll, e input fixo
+
+2. *Lista de Mensagens (MessageList.tsx)*
+   - ScrollArea com padding adequado
+   - Mensagens alinhadas à esquerda (outros) e direita (usuário atual)
+   - Cada mensagem contém:
+     * Avatar circular (40x40px)
+     * Nome do autor em negrito
+     * Timestamp formatado em português (Hoje às HH:mm, Ontem às HH:mm, ou DD/MM/YYYY às HH:mm)
+     * Bolha de mensagem com bordas arredondadas
+     * Conteúdo com suporte a menções destacadas
+   - Mensagens do usuário: fundo azul vibrante, texto branco
+   - Mensagens de outros: fundo cinza claro (muted), texto escuro
+   - Menções (@nome) destacadas com fundo semi-transparente da cor primary
+
+3. *Input de Mensagens (MessageInput.tsx)*
+   - Textarea expansível com altura mínima de 80px
+   - Placeholder: "Digite sua mensagem... Use @ para mencionar alguém"
+   - Botão de envio azul com ícone Send do Lucide
+   - Sistema de menções com @:
+     * Detecta @ digitado e abre popover de sugestões acima do input
+     * Filtra participantes conforme texto digitado após @
+     * Popover mostra avatar, nome e cargo
+     * Ao clicar, insere menção completa no texto
+     * Fecha automaticamente após seleção
+   - Hint: "Pressione Enter para enviar, Shift+Enter para nova linha"
+   - Validação de menções ao enviar (apenas usuários válidos)
+
+*DESIGN SYSTEM (CSS Variables):*
+
+```css
+--primary: 217 83% 58%; /* Azul vibrante para mensagens enviadas */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;  /* Cinza claro para mensagens recebidas */
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+[Nota: Final]
+
+Não é necessário uma aba de Dados, ja que nessa tela não será possível criar nem editar nem excluir, apenas visualizar.
+
+
+Crie uma aplicação React standalone que replique a tela de Presença, utilizando as seguintes tecnologias base: React 18.3.1, TypeScript, Vite como bundler, Tailwind CSS para estilização, Shadcn UI como biblioteca de componentes, Supabase para backend e persistência de dados, React Hook Form 7.61.1 com Zod 3.25.76 para validação de formulários, e date-fns 4.1.0 para manipulação de datas. A aplicação deve ser completamente autônoma, sem necessidade de autenticação ou login.
+
+A estrutura de arquivos deve conter: src/pages/Presenca.tsx como arquivo principal da página, src/components/ui/ contendo todos os componentes Shadcn UI necessários (card, input, button, select, dialog, badge, etc), src/integrations/supabase/client.ts para configuração do cliente Supabase, src/hooks/use-toast.ts para sistema de notificações toast, e src/index.css para estilos globais e variáveis CSS customizadas.
+
+Crie a interface TypeScript PresenceEntry com os seguintes campos: id do tipo number obrigatório, idresposta do tipo number obrigatório, idescala do tipo number obrigatório, idcomunicacao do tipo number obrigatório, nomepessoaescala do tipo string obrigatório, status do tipo string obrigatório (valores possíveis: "1" para confirmado, "2" para atraso, "3" para falta, "4" ou "5" para justificado), dtcomunicacao do tipo string obrigatório no formato ISO de timestamp, dtresposta do tipo string opcional no formato de data, horaresposta do tipo string opcional no formato de hora, plantao do tipo string opcional, coordenador do tipo string opcional, e empresa do tipo string opcional.
+
+O componente principal Presenca.tsx deve gerenciar os seguintes estados usando useState: entries como array de PresenceEntry inicializado vazio, searchTerm como string para busca inicializado vazio, filterStatus como string para filtro de status inicializado como "all", isDialogOpen como boolean para controlar modal de criação inicializado como false, loading como boolean para estado de carregamento inicializado como true, e formData como objeto contendo campos para novo registro (pessoa, local, status, horario, observacoes).
+
+Implemente um useEffect que execute apenas uma vez ao montar o componente, chamando a função fetchPresenceData. A função fetchPresenceData deve ser assíncrona e realizar o seguinte: fazer query na tabela resposta_comunicacao do Supabase com select em todos os campos, fazer join com a tabela escala através de idescala pegando os campos nomepessoaescala e plantao, fazer join com a tabela coordenador através de id_coordenador pegando o campo nome como coordenador, fazer join com a tabela plantao através de id_plantao para acessar a empresa, fazer join com a tabela empresa através de id_empresa pegando o campo nome como empresa, ordenar os resultados por dtcomunicacao em ordem descendente, tratar erros com console.error e toast de erro, e ao final sempre setar loading como false.
+
+Crie a função filteredEntries que filtra o array entries baseado em searchTerm (busca case-insensitive em nomepessoaescala) e filterStatus (se não for "all", filtra pelo status específico). Implemente a função getStatusColor que recebe um status string e retorna classes Tailwind: para status "1" retorna "bg-green-500", para "2" retorna "bg-yellow-500", para "3" retorna "bg-red-500", para "4" ou "5" retorna "bg-blue-500", e para outros retorna "bg-gray-500".
+
+Implemente a função getStatusText que converte o código de status em texto legível: "1" retorna "Confirmado", "2" retorna "Atraso", "3" retorna "Falta", "4" ou "5" retorna "Justificado", outros retornam "Desconhecido". Crie funções auxiliares formatTime que recebe string de hora e retorna formatada sem segundos, e formatDate que recebe string ISO e retorna data formatada usando date-fns com formato "dd/MM/yyyy HH:mm".
+
+A renderização da UI deve conter um header com título "Presença" em texto grande e bold, descrição "Acompanhe a presença e respostas da equipe", e informação do responsável atual. Logo abaixo, renderize um componente Card do Shadcn contendo: um Input de busca com placeholder "Buscar por nome...", um Select para filtro de status com opções "Todos", "Confirmados", "Atrasos", "Faltas", e "Justificados", e um botão "Nova Entrada" que abre o dialog de criação.
+
+Dentro do mesmo Card, renderize a lista de entradas usando map em filteredEntries. Cada entrada deve ser um Card aninhado exibindo: badge colorido com o status usando getStatusColor e getStatusText, nome da pessoa em destaque, data e hora da comunicação formatadas, data e hora da resposta quando disponíveis, informações de plantão/coordenador/empresa quando disponíveis, e um ícone de check ou clock baseado no status.
+
+Implemente um Dialog do Shadcn para criar nova entrada, controlado por isDialogOpen. O dialog deve ter título "Nova Entrada de Presença" e conter um formulário com os seguintes campos: Select para escolher pessoa (buscar de escala), Select para local/plantão, Select para status com as 5 opções, Input datetime-local para horário, Textarea para observações. O rodapé do dialog deve ter botão "Cancelar" que fecha o modal e "Salvar" que submete o formulário.
+
+O schema do Supabase deve incluir a tabela resposta_comunicacao com colunas: idresposta SERIAL PRIMARY KEY, idescala INTEGER NOT NULL, idcomunicacao INTEGER NOT NULL, status VARCHAR, dtcomunicacao TIMESTAMP, dtresposta DATE, horaresposta TIME. Tabela escala com: idescala SERIAL PRIMARY KEY, nomepessoaescala VARCHAR NOT NULL, plantao VARCHAR, telefone VARCHAR, dataescala TIMESTAMP, id_coordenador UUID, id_plantao UUID. Tabela coordenador com: id_coordenador UUID PRIMARY KEY DEFAULT gen_random_uuid(), nome TEXT NOT NULL, telefone NUMERIC. Tabela plantao com: id_plantao UUID PRIMARY KEY DEFAULT gen_random_uuid(), nome TEXT NOT NULL, id_empresa UUID. Tabela empresa com: id_empresa UUID PRIMARY KEY DEFAULT gen_random_uuid(), nome TEXT NOT NULL.
+
+Configure o cliente Supabase em src/integrations/supabase/client.ts importando createClient de @supabase/supabase-js, defina as constantes SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY com os valores do seu projeto, exporte o cliente criado com createClient passando URL e chave, configure auth com storage localStorage, persistSession true, e autoRefreshToken true. Habilite RLS (Row Level Security) em todas as tabelas para demonstração, criando políticas que permitam SELECT por todos.
+
+Para estilização, configure Tailwind CSS no index.css definindo variáveis CSS customizadas em :root usando HSL: --background: 0 0% 100%, --foreground: 222.2 84% 4.9%, --card: 0 0% 100%, --card-foreground: 222.2 84% 4.9%, --primary: 222.2 47.4% 11.2%, --primary-foreground: 210 40% 98%, --secondary: 210 40% 96.1%, --secondary-foreground: 222.2 47.4% 11.2%, --muted: 210 40% 96.1%, --muted-foreground: 215.4 16.3% 46.9%, --accent: 210 40% 96.1%, --accent-foreground: 222.2 47.4% 11.2%, --destructive: 0 84.2% 60.2%, --destructive-foreground: 210 40% 98%, --border: 214.3 31.8% 91.4%, --input: 214.3 31.8% 91.4%, --ring: 222.2 84% 4.9%, --radius: 0.5rem. Configure também variáveis para dark mode em .dark.
+
+Use os seguintes componentes Shadcn UI: Card (card.tsx) com CardHeader, CardTitle, CardDescription, CardContent, Input (input.tsx) para campos de texto, Button (button.tsx) com variantes default e outline, Select (select.tsx) com SelectTrigger, SelectValue, SelectContent, SelectItem, Dialog (dialog.tsx) com DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, Badge (badge.tsx) para status coloridos, Label (label.tsx) para labels de formulário, Textarea (textarea.tsx) para observações. Todos os componentes devem usar as variantes do CVA (class-variance-authority) e utilitário cn de src/lib/utils.ts.
+
+Para ícones, utilize lucide-react importando: Search para busca, Filter para filtro, Plus para adicionar, Clock para indicador de tempo, Check para confirmação, AlertCircle para alertas, Calendar para datas, User para pessoa. Implemente responsividade usando classes Tailwind: grid com grid-cols-1 em mobile e md:grid-cols-2 lg:grid-cols-3 em telas maiores, overflow-x-auto para tabelas, gap-4 para espaçamento consistente.
+
+Configure o sistema de toast usando sonner instalado via npm, crie o hook useToast em src/hooks/use-toast.ts retornando funções toast.success, toast.error, toast.info, adicione o componente Toaster no root da aplicação. Use toast.error para erros de fetch, toast.success para operações bem-sucedidas. Implemente skeleton loading usando o componente Skeleton do Shadcn enquanto loading é true, mostrando placeholders animados para cards de entrada.
+
+Para tratamento de dados vazios, exiba uma mensagem centralizada "Nenhuma entrada encontrada" com um ícone quando filteredEntries.length for 0. Adicione animações suaves usando Tailwind com transition-all duration-200 em hover states. Use clsx ou cn para composição condicional de classes CSS. Configure fonte Inter como padrão no index.css importando do Google Fonts.
+
+Implemente o tailwind.config.ts estendendo o tema padrão com: borderRadius usando var(--radius), colors mapeando todas as variáveis CSS (background usando hsl(var(--background)), foreground usando hsl(var(--foreground)), etc). Adicione o plugin tailwindcss-animate para animações. Configure content para escanear arquivos em "./src/**/*.{ts,tsx}".
+
+Garanta acessibilidade adicionando aria-labels apropriados em botões e inputs, use elementos semânticos HTML5 (header, main, section), implemente navegação por teclado em todos os componentes interativos, mantenha contraste adequado entre texto e fundo seguindo WCAG 2.1 nível AA. Use React.memo para otimizar re-renderizações de componentes de lista quando apropriado.
