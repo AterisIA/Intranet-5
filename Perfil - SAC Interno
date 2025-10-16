@@ -1,0 +1,125 @@
+[Nota: Intranet - Módulo Perfil - SAC Interno (Canal Pessoal de Demandas)]
+
+[Nota: Onde]
+Dentro do item de menu chamado “Perfil”, crie um subitem chamado “SAC Interno”. Ao clicar em “SAC Interno”, abrir uma página chamada “SAC Interno — Canal Pessoal de Demandas”, seguindo o padrão visual dos demais módulos utilizando shadcn/ui.
+
+[Nota: O que]
+Exibir um cabeçalho de KPIs seguido por uma tabela de demandas do usuário e um botão “Nova Demanda”.
+
+Cabeçalho (KPIs em cards): Abertas, Em atendimento, Pendentes do usuário, Concluídas no mês. Números em destaque (text-3xl), ícones sutis do lucide, grid responsivo (md: 4 colunas; sm: empilha), Card/CardContent com rounded-2xl e shadow-md.
+
+Tabela de Demandas com colunas: “Protocolo”, “Título”, “Categoria”, “Prioridade”, “Status”, “SLA” (tempo restante), “Última atualização” e “Ações”. As linhas devem ter hover sutil (bg-muted/50), cantos levemente arredondados e tooltips para textos truncados.
+
+Ações: na própria coluna “Ações”, exibir diretamente os ícones de Visualizar, Editar e Cancelar (sem menu de três pontos), com aria-labels e foco de teclado.
+A listagem deve reagir a changes em filters, search e sort providos por useTableFilters; usar consistentemente componentes shadcn/ui; integrar date range pickers (período de abertura) ao useTableFilters; exibir toasts e loaders para criar/editar/cancelar demanda e enviar mensagem; garantir acessibilidade com foco de teclado e aria-labels.
+
+[Nota: Ordenação]
+Usar o estado sort de useTableFilters, com ícone de ordenação ao lado do título da coluna (ex.: Protocolo, Prioridade, Status, SLA, Última atualização), alternando entre crescente e decrescente ao clicar e atualizando o estado.
+
+[Nota: Filtros]
+Acima da tabela, incluir um container TableFilters controlado por useTableFilters e useFilterOptions; dentro dele:
+
+TableSearchInput que faz busca geral (em Protocolo/Título/Descrição) e filtra automaticamente enquanto o usuário digita, sem botão de aplicar;
+
+TableFilterSelect para Categoria (RH, TI, Facilities, Financeiro, …), Prioridade (Baixa, Média, Alta, Urgente), Status (Aberta, Em triagem, Em atendimento, Aguardando usuário, Concluída, Cancelada);
+
+DateRangePicker para Período de Abertura;
+
+Chips dos filtros ativos (ex.: “Categoria: TI ×”, “Prioridade: Urgente ×”, intervalos de datas), cada chip removível individualmente;
+
+Ação “Limpar tudo” integrada ao estado de useTableFilters; toda aplicação ou remoção de filtro deve atualizar instantaneamente a listagem.
+
+[Nota: Exibir chips para barra de pesquisa]
+Em TableSearchInput também deve renderizar os chips dos filtros ativos expostos por useTableFilters (por exemplo, “Status: Em atendimento ×”), enquanto o usuário digita.
+
+[Nota: Abas das opções criar, editar e visualizar]
+Ao clicar em uma linha da tabela ou no botão “Nova Demanda”, abrir um pop-up reutilizável (modal) com as abas: Dados, Sistema e Mensagens.
+
+[Nota: Aba Dados]
+Campos (somente UI):
+
+Categoria (select) e Subcategoria (select dependente) — obrigatórios.
+
+Título (input de texto) — obrigatório.
+
+Descrição (textarea com contador) — obrigatório.
+
+Prioridade (radio pills: Baixa/Média/Alta/Urgente).
+
+Anexos (upload — imagem/PDF; miniaturas/preview; substituir/remover antes de salvar).
+
+Resumo lateral (card): SLA alvo (texto), Canal (texto) e Etiqueta(s) (chips estáticos).
+Validação e UX (visuais): rótulos claros, mensagens de erro ao lado do campo, aria-label em inputs/botões, foco de teclado, toasts e loaders ao salvar (UI).
+
+[Nota: Ações do Formulário no Pop-up]
+Botões: “Salvar”, “Salvar e continuar” (mantém modal aberto) e “Cancelar”.
+
+Cancelar realiza dirty check com diálogo de confirmação antes de descartar alterações.
+
+Ao salvar, exibir toast de sucesso/erro e atualizar instantaneamente a listagem.
+
+[Nota: Aba Sistema]
+Exibir uma timeline técnica dinâmica com histórico da demanda em ordem cronológica (mais recentes primeiro) dentro de ScrollArea 400px.
+
+Coluna esquerda: ícone circular 40x40 (w-10 h-10) sobre bg-primary/10 com ícone lucide text-primary 20px (w-5 h-5); itens conectados por linha vertical cinza (bg-border) 1px que para no último item.
+
+Coluna direita: título do evento (font-semibold text-sm); metadados com micro-ícone UserRound (w-3.5 h-3.5) + usuário e CalendarClock + timestamp "dd/MM/yyyy 'às' HH:mm" (date-fns/ptBR), em text-xs text-muted-foreground, separados por border-b (exceto o último).
+Mapeamento de ícones: "created" → CirclePlus, "edited" → PencilLine, "marked" → Tag, "deleted" → Trash2, "restored" → RotateCcw.
+Interface TimelineEvent: id (string), type (union dos 5 tipos), user (string), timestamp (Date), description (string). O componente Timeline recebe array de events, ordena por timestamp decrescente e renderiza cada TimelineItem passando a prop isLast.
+
+[Nota: Aba Mensagens]
+Na aba “Mensagens”, crie um sistema de chat colaborativo moderno usando React, TypeScript, Tailwind CSS e componentes Shadcn/UI com as seguintes especificações:
+
+ESTRUTURA DE COMPONENTES:
+
+Componente Principal (ChatColaborativo.tsx)
+Gerencia estado de mensagens e participantes
+Props: recordTitle (título do registro), recordId (ID do registro)
+Estado inicial com 4 participantes mockados com avatares do DiceBear
+Mensagens iniciais demonstrando funcionalidades de menção
+Layout: Container flex vertical sem scroll, distribuindo espaço entre título fixo, área de mensagens com scroll, e input fixo
+
+Lista de Mensagens (MessageList.tsx)
+ScrollArea com padding adequado
+Mensagens alinhadas à esquerda (outros) e direita (usuário atual)
+Cada mensagem contém:
+Avatar circular (40x40px)
+Nome do autor em negrito
+Timestamp formatado em português (Hoje às HH:mm, Ontem às HH:mm, ou DD/MM/YYYY às HH:mm)
+Bolha de mensagem com bordas arredondadas
+Conteúdo com suporte a menções destacadas
+Mensagens do usuário: fundo azul vibrante, texto branco
+Mensagens de outros: fundo cinza claro (muted), texto escuro
+Menções (@nome) destacadas com fundo semi-transparente da cor primary
+
+Input de Mensagens (MessageInput.tsx)
+Textarea expansível com altura mínima de 80px
+Placeholder: "Digite sua mensagem... Use @ para mencionar alguém"
+Botão de envio azul com ícone Send do Lucide
+Sistema de menções com @:
+Detecta @ digitado e abre popover de sugestões acima do input
+Filtra participantes conforme texto digitado após @
+Popover mostra avatar, nome e cargo
+Ao clicar, insere menção completa no texto
+Fecha automaticamente após seleção
+Hint: "Pressione Enter para enviar, Shift+Enter para nova linha"
+Validação de menções ao enviar (apenas usuários válidos)
+
+DESIGN SYSTEM (CSS Variables):
+
+--primary: 217 83% 58%; /* Azul vibrante para mensagens enviadas */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;  /* Cinza claro para mensagens recebidas */
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+[Nota: Regras]
+- Seguir o padrão do sistema
+- Usar os mesmos icones e cores
+- Seguir o mesmo padrão da sessão de filtros
+- Todos os filtros devem aparecer chips quando selecionado
+- Em todas as colunas da tabela deve aparecer o icone de ordenavel
+
+
+[Nota: Final]
