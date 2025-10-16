@@ -1,0 +1,133 @@
+[Nota: Intranet - Portifólio de Produtos - Estoque]
+
+[Nota: Onde]
+Na aba /operacoes/estoque haverá uma página completa de controle de estoque de produtos. A interface deve ser totalmente funcional e responsiva, com cards de estatísticas, tabela ordenável e botão de ajuste (sem ação implementada nesta etapa), replicando exatamente a estrutura visual, campos exibidos e layout especificados.
+
+[Nota: Tecnologias Necessárias]
+React 18, TypeScript, Tailwind CSS, Shadcn/UI (Button, Card, CardHeader, CardTitle, CardDescription, CardContent, Table, TableHeader, TableHead, TableRow, TableBody, TableCell), Supabase Client (@supabase/supabase-js), useToast para notificações, lucide-react (Plus, Edit, Eye, Trash2, Package).
+
+[Nota: Estrutura Geral]
+Container principal com classes container mx-auto p-6 space-y-6.
+Toda a interface é responsiva; a tabela possui scroll horizontal quando necessário.
+
+[Nota: Cabeçalho]
+Seção superior com flex justify-between items-center.
+À esquerda:
+
+Título “Estoque” (text-3xl font-bold)
+
+Subtítulo “Controle de estoque de produtos” (text-muted-foreground)
+À direita:
+
+Botão primário “Ajustar Estoque” com ícone Plus ( mr-2 h-4 w-4 ).
+
+[Nota: Cards de Estatísticas]
+Grid grid grid-cols-1 md:grid-cols-3 gap-4 com 3 Cards. Cada Card usa CardHeader com flex flex-row items-center justify-between space-y-0 pb-2 e CardContent para o valor.
+
+Total de Itens
+
+CardTitle (text-sm font-medium): “Total de Itens”
+
+Ícone Package no header (h-4 w-4 text-muted-foreground)
+
+Conteúdo: número total de itens ( text-2xl font-bold ), calculado por estoque.length.
+
+Estoque Baixo
+
+CardTitle (text-sm font-medium): “Estoque Baixo”
+
+Ícone Package (h-4 w-4 text-yellow-600)
+
+Conteúdo: contagem de itens com quantidade <= quantidade_minima && quantidade > 0 (text-2xl font-bold text-yellow-600).
+
+Sem Estoque
+
+CardTitle (text-sm font-medium): “Sem Estoque”
+
+Ícone Package (h-4 w-4 text-red-600)
+
+Conteúdo: contagem de itens com quantidade === 0 (text-2xl font-bold text-red-600).
+
+[Nota: Card da Tabela]
+Abaixo dos cards, um Card grande com:
+
+CardHeader contendo CardTitle “Itens em Estoque” e CardDescription exibindo “X item(s) cadastrado(s)” onde X é estoque.length.
+
+CardContent com a Table.
+
+[Nota: Tabela de Estoque]
+TableHeader com uma TableRow e os TableHead: Código, Produto, Quantidade, Mínimo, Status, Localização, Ações (este com text-right).
+TableBody renderiza uma TableRow por item com as TableCell:
+
+Código: item.produto?.codigo com classe font-mono.
+
+Produto: item.produto?.nome com classe font-medium.
+
+Quantidade: item.quantidade.
+
+Mínimo: item.quantidade_minima.
+
+Status: usar getStatusEstoque(quantidade, quantidadeMinima) que retorna { label, color } com regras:
+
+quantidade === 0 → { label: "Sem estoque", color: "text-red-600" }
+
+quantidade <= quantidadeMinima → { label: "Estoque baixo", color: "text-yellow-600" }
+
+caso contrário → { label: "Normal", color: "text-green-600" }
+Aplicar color na TableCell.
+
+Localização: item.localizacao || "-".
+
+Ações: TableCell text-right space-x-2 com 3 botões variant="ghost" size="sm":
+
+Eye (h-4 w-4) visualizar,
+
+Edit (h-4 w-4) editar,
+
+Trash2 (h-4 w-4) excluir.
+(Nesta etapa, sem implementar as ações; apenas renderizar os botões.)
+
+[Nota: Integração de Dados]
+Estados iniciais:
+
+estoque = [],
+
+loading = true.
+useEffect chama loadEstoque() na montagem.
+
+[Nota: loadEstoque]
+Função assíncrona que consulta Supabase na tabela estoque com join em produtos para nome e codigo:
+.from('estoque').select('*, produto:produtos(nome, codigo)').order('quantidade')
+Em caso de erro, mostrar toast com título “Erro ao carregar estoque”, descrição com error.message, variant: "destructive".
+No finally, definir loading = false.
+
+[Nota: Estado de Carregamento]
+Enquanto loading for true, mostrar uma div centralizada com container mx-auto p-6 e o texto “Carregando estoque…”.
+
+[Nota: Interfaces TypeScript]
+Definir interfaces:
+
+EstoqueItem: id: string, produto_id: string, quantidade: number, quantidade_minima: number, localizacao?: string, created_at: string, updated_at: string, created_by: string, updated_by: string.
+
+ProdutoRelacionado: nome: string, codigo: string.
+EstoqueItem referencia produto?: ProdutoRelacionado.
+
+[Nota: Estilização]
+Usar classes Tailwind e componentes Shadcn/UI para consistência:
+
+Cards com sombras suaves;
+
+Tabela com bordas e hover nas linhas;
+
+Botões de ação com mudança de cor no hover;
+
+Títulos e descrições conforme especificado.
+
+[Nota: Responsividade]
+Grid de cards: grid-cols-1 no mobile e md:grid-cols-3 em telas médias+.
+Tabela responsiva com scroll horizontal quando necessário.
+
+[Nota: Observações Finais]
+Não implementar as funcionalidades de ajustar estoque, visualizar, editar ou excluir — apenas renderizar os botões.
+Para replicação inicial, usar mock data em memória se necessário.
+O foco é replicar exatamente a estrutura visual, campos exibidos e o layout descritos.
