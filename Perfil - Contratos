@@ -1,0 +1,169 @@
+[Nota: Intranet - Módulo Perfil - Contratos]
+
+[Nota: Onde]
+Dentro do item de menu chamado “Perfil”, crie um subitem chamado “Contratos”. Ao clicar em “Contratos”, abrir uma página chamada “Contratos”, seguindo o padrão visual dos demais módulos utilizando shadcn/ui.
+
+[Nota: O que]
+Apresentar uma tabela de listagem unificada de Vínculos Ativos e Termos Aceitos, com as colunas “Tipo” (Vínculo/Termo), “Título/Descrição”, “Vigência/Referência”, “Status/Aceite”, “Criado em” e “Ações”, todas ordenáveis; o título da coluna “Ações” deve ficar centralizado e alinhado visualmente entre os ícones e, na própria coluna, exibir diretamente os ícones de Visualizar, Editar e Excluir (sem menu de três pontos).
+A página deve exibir um botão “Novo Registro” (para cadastrar um novo Vínculo ou Termo).
+
+Tipo: badge “Vínculo” ou “Termo”.
+
+Título/Descrição: nome do contrato/vínculo ou do termo/política (com subtítulo opcional em muted).
+
+Vigência/Referência:
+
+Para Vínculo: Início → Fim (ex.: “01/03/2025 → 28/02/2026”); quando sem fim, exibir “Em aberto”.
+
+Para Termo: Versão (ex.: “v2.1”) e Data de Aceite (ex.: “Aceito em 15/05/2025”).
+
+Status/Aceite:
+
+Vínculo: Ativo, Encerrado, Suspenso, Expirado (badge colorida).
+
+Termo: Aceito, Pendente, Revogado (badge colorida).
+
+Criado em: data/hora do registro.
+
+Ações: ícones Eye, Pencil, Trash com aria-label.
+
+[Nota: Ordenação]
+A ordenação deve usar o estado sort de useTableFilters, com ícone de ordenação ao lado do título da coluna, alternando entre crescente e decrescente ao clicar e atualizando o estado.
+
+[Nota: Filtros]
+Acima da tabela, incluir um container TableFilters controlado pelos hooks useTableFilters e useFilterOptions; dentro dele:
+
+TableSearchInput que faz busca geral (em Título/Descrição/Versão/Empresa/Cliente) e filtra automaticamente enquanto o usuário digita, sem botão de aplicar;
+
+TableFilterSelect para Tipo (Vínculo, Termo), Status/Aceite (Ativo, Encerrado, Suspenso, Expirado, Aceito, Pendente, Revogado), Empresa, Cliente;
+
+DateRangePicker para Vigência/Aceite;
+
+Chips dos filtros ativos (ex.: “Tipo: Termo ×”, “Status: Aceito ×”, “Empresa: Matriz ×”, intervalo de datas), cada chip removível individualmente;
+
+Ação “Limpar tudo” integrada ao estado de useTableFilters; toda aplicação ou remoção de filtro deve atualizar instantaneamente a listagem.
+
+[Nota: Exibir chips para barra de pesquisa]
+Em TableSearchInput também deve renderizar os chips dos filtros ativos expostos por useTableFilters (por exemplo, “Tipo: Vínculo ×”, “Status: Ativo ×”), enquanto o usuário digita.
+
+[Nota: Estilo visual da tabela]
+
+Linhas com hover sutil (bg-muted/50) e cantos levemente rounded.
+
+Badges consistentes para Tipo e Status/Aceite (cores acessíveis e rótulos claros).
+
+Vigência/Referência com mini-ícone Calendar; Versão (para Termos) em text-muted-foreground.
+
+Observação (se houver) aparece como subtítulo truncado com tooltip no hover.
+
+[Nota: Abas das opções criar, editar e visualizar]
+Ao clicar em uma linha da tabela ou no botão “Novo Registro”, abrir um pop-up reutilizável (modal) com as abas: Dados, Sistema e Mensagens.
+
+[Nota: Aba Dados]
+(Somente UI) Exibir campos adequados ao Tipo selecionado (Vínculo ou Termo).
+
+Campo “Tipo” (radio pills): Vínculo | Termo.
+
+Quando “Vínculo”:
+
+Título do Vínculo/Contrato (texto) — obrigatório
+
+Empresa (select/autocomplete) — obrigatório
+
+Cliente (select/autocomplete) — opcional
+
+Local/Unidade (select/autocomplete) — opcional
+
+Função/Cargo (texto/select) — opcional
+
+Vigência: Data Início (date) — obrigatório; Data Fim (date) — opcional
+
+Status (select): Ativo, Encerrado, Suspenso, Expirado
+
+Arquivo do Contrato (upload — PDF/Imagem; preview básico; substituir/remover antes de salvar)
+
+Observações (textarea curta)
+
+Quando “Termo”:
+
+Nome do Termo/Política (texto) — obrigatório
+
+Versão (texto curto) — obrigatório
+
+Status de Aceite (select): Aceito, Pendente, Revogado
+
+Data de Aceite (date) — opcional (exibir quando “Aceito”)
+
+Canal/Origem do Aceite (texto curto; ex.: Web/App/IP) — opcional
+
+Arquivo do Termo (upload — PDF/Imagem; preview básico; substituir/remover antes de salvar)
+
+Observações (textarea curta)
+Validação/UX (visuais): rótulos claros, aria-label nos controles, mensagens de erro ao lado do campo; card de resumo à direita com Vigência/Aceite e Status.
+
+[Nota: Ações do Formulário no Pop-up]
+Botões: “Salvar”, “Salvar e continuar” (mantém modal aberto) e “Cancelar”.
+
+Cancelar com dirty check (diálogo).
+
+Ao salvar, exibir toast de sucesso/erro e atualizar instantaneamente a listagem.
+
+[Nota: Aba Sistema]
+Na aba "Sistema" exibir uma timeline técnica dinâmica com histórico do registro em ordem cronológica (mais recentes primeiro) dentro de um ScrollArea de 400px de altura. Cada evento deve ter:
+
+Coluna esquerda com ícone circular 40x40 (w-10 h-10) em bg-primary/10 e ícone lucide text-primary 20px (w-5 h-5), conectados por linha vertical cinza (bg-border) 1px que para no último item.
+
+Coluna direita com título do evento (font-semibold text-sm), metadados com micro-ícone UserRound (w-3.5 h-3.5) + usuário e CalendarClock + timestamp "dd/MM/yyyy 'às' HH:mm" (date-fns/ptBR), text-xs text-muted-foreground, separados por border-b (exceto o último).
+Mapeie os tipos de evento para ícones: "created" → CirclePlus, "edited" → PencilLine, "marked" → Tag, "deleted" → Trash2, "restored" → RotateCcw.
+
+[Nota: Aba Mensagens]
+Na aba “Mensagens”, crie um sistema de chat colaborativo moderno usando React, TypeScript, Tailwind CSS e componentes Shadcn/UI com as seguintes especificações:
+
+ESTRUTURA DE COMPONENTES:
+
+Componente Principal (ChatColaborativo.tsx)
+Gerencia estado de mensagens e participantes
+Props: recordTitle (título do registro), recordId (ID do registro)
+Estado inicial com 4 participantes mockados com avatares do DiceBear
+Mensagens iniciais demonstrando funcionalidades de menção
+Layout: Container flex vertical sem scroll, distribuindo espaço entre título fixo, área de mensagens com scroll, e input fixo
+
+Lista de Mensagens (MessageList.tsx)
+ScrollArea com padding adequado
+Mensagens alinhadas à esquerda (outros) e direita (usuário atual)
+Cada mensagem contém:
+Avatar circular (40x40px)
+Nome do autor em negrito
+Timestamp formatado em português (Hoje às HH:mm, Ontem às HH:mm, ou DD/MM/YYYY às HH:mm)
+Bolha de mensagem com bordas arredondadas
+Conteúdo com suporte a menções destacadas
+Mensagens do usuário: fundo azul vibrante, texto branco
+Mensagens de outros: fundo cinza claro (muted), texto escuro
+Menções (@nome) destacadas com fundo semi-transparente da cor primary
+
+Input de Mensagens (MessageInput.tsx)
+Textarea expansível com altura mínima de 80px
+Placeholder: "Digite sua mensagem... Use @ para mencionar alguém"
+Botão de envio azul com ícone Send do Lucide
+Sistema de menções com @:
+Detecta @ digitado e abre popover de sugestões acima do input
+Filtra participantes conforme texto digitado após @
+Popover mostra avatar, nome e cargo
+Ao clicar, insere menção completa no texto
+Fecha automaticamente após seleção
+Hint: "Pressione Enter para enviar, Shift+Enter para nova linha"
+Validação de menções ao enviar (apenas usuários válidos)
+
+DESIGN SYSTEM (CSS Variables):
+
+--primary: 217 83% 58%; /* Azul vibrante para mensagens enviadas */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;  /* Cinza claro para mensagens recebidas */
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+
+
+
+[Nota: Final]
