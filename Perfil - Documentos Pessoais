@@ -1,0 +1,115 @@
+[Nota: Intranet - Módulo Perfil - Documentos Pessoais]
+
+[Nota: Onde]
+Crie um menu chamado “Perfil”, dentro dele crie um subitem chamado “Documentos Pessoais”. Ao clicar em “Documentos Pessoais”, abrir uma página chamada “Documentos Pessoais”, seguindo o padrão visual dos demais módulos utilizando shadcn/ui.
+
+[Nota: O que]
+Apresentar a tabela de listagem dos documentos pessoais do usuário com as colunas “Tipo de Documento”, “Nome do Arquivo”, “Formato” (Imagem/PDF), “Data de Envio” e “Ações”, todas ordenáveis; o título da coluna “Ações” deve ficar centralizado e alinhado visualmente entre os ícones e, na própria coluna, exibir diretamente os ícones de Visualizar, Editar e Excluir (sem menu de três pontos).
+A listagem deve reagir a changes em filters, search e sort providos por useTableFilters e atualizar automaticamente após criar, editar ou excluir; utilizar consistentemente componentes shadcn/ui, integrar date range pickers (Data de Envio/Atualização) ao useTableFilters, exibir toasts e loaders para criar/editar/excluir e enviar mensagem, e garantir acessibilidade com foco de teclado e aria-labels nos controles e ícones de ação. A página deve exibir um botão “Adicionar Documento”.
+
+[Nota: Ordenação]
+A ordenação deve usar o estado sort de useTableFilters, com ícone de ordenação ao lado do título da coluna, alternando entre crescente e decrescente ao clicar e atualizando o estado.
+
+[Nota: Filtros]
+Acima da tabela, incluir um container TableFilters controlado pelos hooks useTableFilters e useFilterOptions; dentro dele:
+
+TableSearchInput que faz busca geral (em Tipo/Nome do Arquivo/Formato) e filtra automaticamente enquanto o usuário digita, sem botão de aplicar;
+
+TableFilterSelect para Tipo de Documento (RG, CPF, Certidão de Nascimento, Certidão de Casamento/Divórcio, Comprovantes, CNH, Título de Eleitor, etc.) e Formato (Imagem/PDF);
+
+DateRangePicker para Data de Envio;
+
+Chips dos filtros ativos (ex.: “Tipo: RG ×”, “Formato: PDF ×”, intervalos de datas), cada chip removível individualmente;
+
+Ação “Limpar tudo” integrada ao estado de useTableFilters; toda aplicação ou remoção de filtro deve atualizar instantaneamente a listagem.
+
+[Nota: Exibir chips para barra de pesquisa]
+Em TableSearchInput também deve renderizar os chips dos filtros ativos expostos por useTableFilters (por exemplo, “Tipo: CPF ×”, “Formato: Imagem ×”), enquanto o usuário digita.
+
+[Nota: Abas das opções criar, editar e visualizar]
+Ao criar, editar ou visualizar um documento será aberto um pop-up reutilizável (modal) com as abas: Dados, Sistema e Mensagens.
+
+[Nota: Aba Dados]
+Campos:
+
+Tipo de Documento (select) — obrigatório. Opções comuns: RG, CPF, Certidão de Nascimento, Certidão de Casamento, Certidão de Divórcio, CNH, Título de Eleitor, Comprovante de Residência, Comprovante de Escolaridade, Comprovantes em geral (lista pode ser estendida).
+
+Arquivo do Documento (upload) — obrigatório. Aceitar imagem (JPG/PNG/WEBP) e PDF; pré-visualização quando imagem; mostrar nome e tamanho do arquivo; opção de substituir arquivo e remover antes de salvar.
+
+(Opcional) Observações (textarea curta).
+Validações e UX:
+
+Tamanho máximo configurável (ex.: 10 MB); bloquear extensões não permitidas; mensagens de erro claras; react-hook-form + Zod.
+
+Acessibilidade com aria-label, foco de teclado, e feedback de erro junto ao campo.
+
+Ao salvar, exibir toast de sucesso/erro e atualizar instantaneamente a listagem.
+
+[Nota: Ações do Formulário no Pop-up]
+Botões: “Salvar”, “Salvar e continuar” (mantém modal aberto), “Cancelar”.
+
+Cancelar realiza dirty check com diálogo de confirmação antes de descartar alterações.
+
+Visualizar no modo de leitura: mostrar preview (imagem no próprio modal; PDF em viewer embutido/iframe se disponível) com botão Fechar.
+
+[Nota: Aba Sistema]
+Na aba "Sistema" que exibe uma timeline técnica dinâmica com histórico do documento em ordem cronológica (mais recentes primeiro) dentro de um ScrollArea de 400px de altura. Cada evento deve ter: coluna esquerda com ícone circular de 40x40px (w-10 h-10) sobre bg-primary/10 e ícone azul (text-primary) de 20px (w-5 h-5) do lucide-react, conectados por linha vertical cinza (bg-border) de 1px que para no último item; coluna direita com título do evento em font-semibold text-sm, linha de metadados com micro-ícone UserRound (w-3.5 h-3.5) + usuário, e micro-ícone CalendarClock + timestamp formatado em português "dd/MM/yyyy 'às' HH:mm" usando date-fns e locale ptBR, tudo em text-xs text-muted-foreground, separados por border-b exceto o último item.
+Mapeie os tipos de evento para ícones: "created" → CirclePlus, "edited" → PencilLine, "marked" → Tag, "deleted" → Trash2, "restored" → RotateCcw, todos com a mesma cor (text-primary, bg-primary/10).
+A interface TimelineEvent deve ter id (string), type (union dos 5 tipos), user (string), timestamp (Date) e description (string). O componente Timeline recebe array de events, ordena por timestamp decrescente e renderiza cada TimelineItem passando a prop isLast para o último elemento controlar a linha vertical.
+
+[Nota: Aba Mensagens]
+Na aba “Mensagens”, crie um sistema de chat colaborativo moderno usando React, TypeScript, Tailwind CSS e componentes shadcn/ui com as seguintes especificações:
+
+ESTRUTURA DE COMPONENTES:
+
+Componente Principal (ChatColaborativo.tsx)
+
+Gerencia estado de mensagens e participantes
+
+Props: recordTitle (ex.: “Documento: RG”), recordId (ID do documento)
+
+Estado inicial com 4 participantes mockados com avatares do DiceBear
+
+Mensagens iniciais demonstrando funcionalidades de menção
+
+Layout: Container flex vertical sem scroll, distribuindo espaço entre título fixo, área de mensagens com scroll, e input fixo
+
+Lista de Mensagens (MessageList.tsx)
+
+ScrollArea com padding adequado
+
+Mensagens à esquerda (outros) e direita (usuário atual)
+
+Cada mensagem: avatar circular (40x40px), nome em negrito, timestamp formatado (Hoje às HH:mm, Ontem às HH:mm, ou DD/MM/YYYY às HH:mm), bolha arredondada, conteúdo com menções destacadas
+
+Mensagens do usuário: fundo azul vibrante e texto branco; de outros: fundo cinza claro (muted) e texto escuro
+
+Menções (@nome) com fundo semi-transparente da cor primary
+
+Input de Mensagens (MessageInput.tsx)
+
+Textarea expansível (min 80px)
+
+Placeholder: "Digite sua mensagem... Use @ para mencionar alguém"
+
+Botão de envio com ícone Send (Lucide)
+
+Menções com @: detecção do @, popover de sugestões acima do input, filtro por digitação, avatar + nome + cargo, inserção da menção ao clicar, fechamento automático
+
+Hint: "Pressione Enter para enviar, Shift+Enter para nova linha"
+
+Validação das menções (apenas usuários válidos)
+
+[Nota: Design System (CSS Variables)]
+
+--primary: 217 83% 58%; /* Azul vibrante para mensagens enviadas */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;  /* Cinza claro para mensagens recebidas */
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+[Nota: Regras]
+Seguir o padrão visual do sistema, buscando seguir os mesmo tamanhos padrões, usar os mesmos ícones e etc.
+
+[Nota: Final]
