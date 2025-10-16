@@ -1,0 +1,93 @@
+[Nota: Intranet - Módulo Perfil - Contatos de Emergência]
+
+[Nota: Onde]
+Dentro do item de menu chamado **“Perfil”**, crie um subitem chamado **“Contatos de Emergência”**. Ao clicar em “Contatos de Emergência”, abrir uma página chamada **“Contatos de Emergência”**, seguindo o padrão visual dos demais módulos utilizando **shadcn/ui**.
+
+[Nota: O que]
+Apresentar a tabela de listagem dos contatos de emergência com as colunas **“Nome”**, **“Telefone”**, **“Tipo de Contato”** e **“Ações”**, todas **ordenáveis**; o título da coluna **“Ações”** deve ficar centralizado e alinhado visualmente entre os ícones e, na própria coluna, exibir diretamente os ícones de **Visualizar**, **Editar** e **Excluir** (**sem** menu de três pontos).
+A listagem deve reagir a changes em **filters**, **search** e **sort** providos por **useTableFilters** e atualizar automaticamente após **criar, editar ou excluir**; utilizar consistentemente componentes **shadcn/ui**, integrar **date range pickers** (Data de Criação/Atualização) ao **useTableFilters**, exibir **toasts** e **loaders** para criar/editar/excluir e **enviar mensagem**, e garantir acessibilidade com foco de teclado e **aria-labels** nos controles e ícones de ação. A página deve exibir um botão **“Adicionar Contato”**.
+
+> Observação: **E-mail não deve aparecer como coluna** na tabela.
+
+[Nota: Ordenação]
+A ordenação deve usar o estado **sort** de **useTableFilters**, com **ícone de ordenação ao lado do título** da coluna, alternando entre **crescente** e **decrescente** ao clicar e atualizando o estado.
+
+[Nota: Filtros]
+Acima da tabela, incluir um container **TableFilters** controlado pelos hooks **useTableFilters** e **useFilterOptions**; dentro dele:
+
+* **TableSearchInput** que faz **busca geral** (em Nome/Telefone/Tipo de Contato) e **filtra automaticamente enquanto o usuário digita**, **sem botão de aplicar**;
+* **TableFilterSelect** para **Tipo de Contato** (ex.: Familiar, Amigo, Parceiro, Colega, Vizinho, etc.);
+* **DateRangePicker** para **Data de Criação**;
+* **Chips** dos filtros ativos (ex.: “Tipo: Familiar ×”, intervalos de datas), cada chip **removível individualmente**;
+* Ação **“Limpar tudo”** integrada ao estado de **useTableFilters**; toda aplicação ou remoção de filtro deve **atualizar instantaneamente** a listagem.
+
+[Nota: Exibir chips para barra de pesquisa]
+Em **TableSearchInput** também deve renderizar os **chips dos filtros ativos** expostos por **useTableFilters** (por exemplo, “Tipo: Amigo ×”), **enquanto o usuário digita**.
+
+[Nota: Abas das opções criar, editar e visualizar]
+Ao **criar**, **editar** ou **visualizar** um contato de emergência será aberto um **pop-up reutilizável** (modal) com as **abas**: **Dados**, **Sistema** e **Mensagens**.
+
+[Nota: Aba Dados]
+Campos:
+
+* **Nome** (texto) — **obrigatório**
+* **Telefone** (texto com máscara) — **obrigatório**
+* **E-mail** (e-mail) — **opcional**
+* **Tipo de Contato** (select) — **obrigatório**. **Itens sugeridos:** **Familiar**, **Amigo**, **Parceiro**, **Colega**, **Vizinho** (lista pode ser estendida)
+  **Validações e UX:**
+* Validação via **react-hook-form + Zod**; mensagens de erro claras; **aria-invalid** nos inputs inválidos; foco de teclado; **aria-label** nos campos e botões.
+* Ao salvar, exibir **toast** de sucesso/erro e **atualizar instantaneamente** a listagem.
+
+[Nota: Ações do Formulário no Pop-up]
+Botões: **“Salvar”**, **“Salvar e continuar”** (mantém modal aberto), **“Cancelar”**.
+
+* **Cancelar** realiza *dirty check* com diálogo de confirmação antes de descartar alterações.
+* **Visualizar** no modo de leitura: exibir os campos em layout somente leitura.
+
+[Nota: Aba Sistema]
+Na aba "Sistema" que exibe uma **timeline técnica dinâmica** com histórico do contato em **ordem cronológica (mais recentes primeiro)** dentro de um **ScrollArea de 400px** de altura. Cada evento deve ter: coluna esquerda com **ícone circular de 40x40px (w-10 h-10)** sobre **bg-primary/10** e ícone azul (**text-primary**) de **20px (w-5 h-5)** do **lucide-react**, conectados por **linha vertical cinza (bg-border) de 1px** que **para no último item**; coluna direita com **título do evento** em **font-semibold text-sm**, linha de metadados com micro-ícone **UserRound (w-3.5 h-3.5)** + **usuário**, e micro-ícone **CalendarClock** + **timestamp** formatado em português **"dd/MM/yyyy 'às' HH:mm"** usando **date-fns** e **locale ptBR**, tudo em **text-xs text-muted-foreground**, separados por **border-b** exceto o último item.
+Mapeie os tipos de evento para ícones: **"created" → CirclePlus**, **"edited" → PencilLine**, **"marked" → Tag**, **"deleted" → Trash2**, **"restored" → RotateCcw**, todos com a mesma cor (**text-primary**, **bg-primary/10**).
+A interface **TimelineEvent** deve ter **id** (string), **type** (union dos 5 tipos), **user** (string), **timestamp** (Date) e **description** (string). O componente **Timeline** recebe array de **events**, **ordena por timestamp decrescente** e renderiza cada **TimelineItem** passando a prop **isLast** para o último elemento controlar a linha vertical.
+
+[Nota: Aba Mensagens]
+Na aba “Mensagens”, crie um **sistema de chat colaborativo** moderno usando **React, TypeScript, Tailwind CSS** e componentes **shadcn/ui** com as seguintes especificações:
+
+**ESTRUTURA DE COMPONENTES:**
+
+**Componente Principal (ChatColaborativo.tsx)**
+
+* Gerencia estado de mensagens e participantes
+* Props: **recordTitle** (ex.: “Contato: João – Emergência”), **recordId** (ID do contato)
+* Estado inicial com 4 participantes mockados com avatares do **DiceBear**
+* Mensagens iniciais demonstrando funcionalidades de **menção**
+* Layout: Container flex vertical sem scroll, distribuindo espaço entre título fixo, área de mensagens com scroll, e input fixo
+
+**Lista de Mensagens (MessageList.tsx)**
+
+* **ScrollArea** com padding adequado
+* Mensagens à **esquerda** (outros) e **direita** (usuário atual)
+* Cada mensagem: avatar circular (40x40px), nome em **negrito**, timestamp formatado (**Hoje às HH:mm**, **Ontem às HH:mm**, ou **DD/MM/YYYY às HH:mm**), **bolha** arredondada, conteúdo com **menções destacadas**
+* Mensagens do usuário: **fundo azul vibrante** e **texto branco**; de outros: **fundo cinza claro (muted)** e **texto escuro**
+* Menções (@nome) com **fundo semi-transparente** da cor **primary**
+
+**Input de Mensagens (MessageInput.tsx)**
+
+* **Textarea** expansível (min **80px**)
+* Placeholder: **"Digite sua mensagem... Use @ para mencionar alguém"**
+* Botão de envio com ícone **Send** (Lucide)
+* **Menções com @**: detecção do **@**, **popover** de sugestões acima do input, filtro por digitação, **avatar + nome + cargo**, inserção da menção ao clicar, **fechamento automático**
+* **Hint:** "Pressione **Enter** para enviar, **Shift+Enter** para nova linha"
+* **Validação** das menções (apenas usuários válidos)
+
+[Nota: Design System (CSS Variables)]
+
+```
+--primary: 217 83% 58%; /* Azul vibrante para mensagens enviadas */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;  /* Cinza claro para mensagens recebidas */
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+```
+
+[Nota: Final]
