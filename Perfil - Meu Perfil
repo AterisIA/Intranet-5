@@ -1,0 +1,110 @@
+[Nota: Intranet - Módulo Perfil - Meu Perfil]
+
+[Nota: Onde]
+Dentro do item de menu chamado “Perfil”, crie um subitem chamado “Meu Perfil”. Ao clicar em “Meu Perfil”, abrir uma página chamada “Meu Perfil”, seguindo o padrão visual dos demais módulos utilizando shadcn/ui.
+
+[Nota: O que]
+Exibir no centro da página um cartão de perfil inspirado na referência, com foto de perfil bem grande e centralizada e, logo abaixo, as informações de texto do usuário na seguinte ordem:
+
+Foto de Perfil (avatar bem grande, centralizado)
+
+Nome completo
+
+Cargo
+
+E-mail (texto simples, não é botão nem link)
+
+Telefone (texto simples, não é botão nem link)
+
+Frase curta de biografia
+A página deve exibir um botão “Editar Perfil” que abre um pop-up reutilizável com abas.
+
+[Nota: Layout (ênfase em avatar grande no centro)]
+
+Container: responsivo max-w-sm, centralizado (mx-auto), py-10.
+
+Card (shadcn/ui): rounded-3xl, shadow-xl, border suave; bg-card.
+
+Header do card: faixa decorativa superior com bg-gradient-to-b from-primary to-primary/80, h-36, rounded-t-3xl.
+
+Avatar gigante: circular w-48 h-48 (192×192px), centralizado e sobrepondo o header (-mt-24 no conteúdo), com ring-4 ring-background; imagem com object-cover; fallback com iniciais.
+
+Conteúdo: text-center, space-y-3, px-6.
+
+Nome: text-2xl font-semibold.
+
+Cargo: text-sm text-muted-foreground.
+
+E-mail: linha de texto simples, pode exibir ícone Mail (lucide) apenas como decorativo (aria-hidden="true"); não usar botão, link ou ação.
+
+Telefone: linha de texto simples, pode exibir ícone Phone (lucide) apenas como decorativo; não usar botão, link ou ação.
+
+Biografia: text-sm text-muted-foreground, com line-clamp-3.
+
+Ação principal: botão “Editar Perfil” formato pill (rounded-full px-6, size="lg"), className="mt-4".
+
+Acessibilidade/Interações: foco de teclado, focus-visible:ring-2 ring-primary; ícones com aria-hidden="true"; card com landmark apropriado.
+
+[Nota: Acessibilidade]
+
+alt/aria-label descritivo no Avatar (“Foto de perfil de {nome}”).
+
+Ordem de tabulação adequada e focus-visible no botão “Editar Perfil”.
+
+Contraste conforme design system; título da página como h1; card com role="region" e aria-labelledby apontando para o Nome.
+
+[Nota: Estados e fallback]
+
+Sem foto: exibir iniciais no AvatarFallback no mesmo tamanho (w-48 h-48).
+
+Sem cargo/e-mail/telefone/biografia: renderizar “Não informado” preservando o layout.
+
+Carregamento: Skeleton para header (bloco), avatar (círculo grande) e linhas de texto.
+
+Erro: exibir Alert com ação “Tentar novamente”.
+
+[Nota: Pop-up reutilizável (Editar Perfil) — Abas]
+Ao clicar em “Editar Perfil”, abrir um modal reutilizável (Dialog) com as abas: Dados e Sistema.
+
+[Nota: Aba Dados]
+Campos editáveis do usuário:
+
+Foto de Perfil: upload com pré-visualização (arrastar-soltar + selecionar arquivo), aceitar jpg/png/webp; botão “Remover foto” (fallback para iniciais).
+
+Nome (texto) — obrigatório
+
+Cargo (texto) — opcional
+
+E-mail (campo de e-mail) — obrigatório
+
+Telefone (texto com máscara) — opcional
+
+Biografia (textarea com contador) — opcional
+Validação e UX:
+
+react-hook-form + Zod; mensagens de erro claras; aria-invalid nos inputs inválidos.
+
+Foco de teclado e aria-label em inputs/botões; toasts e loaders ao salvar.
+
+Ao salvar, atualizar instantaneamente o cartão de perfil na página, mantendo o formato de E-mail e Telefone como textos simples (sem links/botões).
+
+[Nota: Ações do Formulário no Pop-up]
+Botões: “Salvar”, “Salvar e continuar” (mantém modal aberto) e “Cancelar”.
+
+Cancelar com dirty check (confirmação).
+
+Ao salvar, exibir toast de sucesso/erro e refletir alterações no cartão de perfil.
+
+[Nota: Aba Sistema]
+Na aba "Sistema" que exibe uma timeline técnica dinâmica com histórico do perfil em ordem cronológica (mais recentes primeiro) dentro de um ScrollArea de 400px de altura. Cada evento deve ter:
+
+Coluna esquerda com ícone circular de 40x40px (w-10 h-10) sobre bg-primary/10 e ícone azul (text-primary) de 20px (w-5 h-5) do lucide-react, conectados por linha vertical cinza (bg-border) de 1px que para no último item.
+
+Coluna direita com título do evento em font-semibold text-sm, linha de metadados com micro-ícone UserRound (w-3.5 h-3.5) + nome do usuário e micro-ícone CalendarClock + timestamp formatado em português "dd/MM/yyyy 'às' HH:mm" usando date-fns com locale ptBR, tudo em text-xs text-muted-foreground, separados por border-b exceto o último item.
+Mapeie os tipos de evento para ícones: "created" → CirclePlus, "edited" → PencilLine, "marked" → Tag, "deleted" → Trash2, "restored" → RotateCcw, todos com a mesma cor (text-primary, bg-primary/10).
+A interface TimelineEvent deve ter id (string), type (union dos 5 tipos), user (string), timestamp (Date) e description (string). O componente Timeline recebe array de events, ordena por timestamp decrescente e renderiza cada TimelineItem passando a prop isLast para o último item controlar a linha vertical.
+
+[Nota: Componentes shadcn/ui sugeridos]
+Card, CardContent, Avatar, AvatarImage, AvatarFallback, Button, Separator, Tabs, TabsList, TabsTrigger, TabsContent, Dialog, Form, Input, Textarea, ScrollArea, Skeleton, Alert, Toast.
+
+[Nota: Final]
