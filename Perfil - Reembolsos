@@ -1,0 +1,120 @@
+[Nota: Intranet - Módulo Perfil - Reembolsos]
+
+[Nota: Onde]
+Dentro do item de menu chamado “Perfil”, crie um subitem chamado “Reembolsos”. Ao clicar em “Reembolsos”, abrir uma página chamada “Reembolsos”, seguindo o padrão visual dos demais módulos utilizando shadcn/ui.
+
+[Nota: O que]
+Apresentar uma tabela de listagem dos reembolsos do usuário com as colunas “Reembolso” (título do gasto), “Valor”, “Status” (Pago, Em análise, Reprovado, Cancelado, etc.) e “Ações”, todas ordenáveis; o título da coluna “Ações” deve ficar centralizado e alinhado visualmente entre os ícones e, na própria coluna, exibir diretamente os ícones de Visualizar, Editar e Excluir (sem menu de três pontos).
+A listagem deve reagir a changes em filters, search e sort providos por useTableFilters e atualizar automaticamente após criar, editar ou excluir; utilizar consistentemente componentes shadcn/ui, integrar date range pickers (Data de Criação/Envio) ao useTableFilters, exibir toasts e loaders para criar/editar/excluir e enviar mensagem, e garantir acessibilidade com foco de teclado e aria-labels nos controles e ícones de ação. A página deve exibir um botão “Novo Reembolso”.
+
+[Nota: Ordenação]
+A ordenação deve usar o estado sort de useTableFilters, com ícone de ordenação ao lado do título da coluna (ex.: Reembolso, Valor, Status), alternando entre crescente e decrescente ao clicar e atualizando o estado.
+
+[Nota: Filtros]
+Acima da tabela, incluir um container TableFilters controlado pelos hooks useTableFilters e useFilterOptions; dentro dele:
+
+TableSearchInput que faz busca geral (em Reembolso/Descrição) e filtra automaticamente enquanto o usuário digita, sem botão de aplicar;
+
+TableFilterSelect para Status (Pago, Em análise, Reprovado, Cancelado) e, opcionalmente, Faixa de Valor (pré-sets: até R$100, R$100–R$500, >R$500);
+
+DateRangePicker para Data de Criação/Envio;
+
+Chips dos filtros ativos (ex.: “Status: Em análise ×”, “Valor: > R$500 ×”, intervalo de datas), cada chip removível individualmente;
+
+Ação “Limpar tudo” integrada ao estado de useTableFilters; toda aplicação ou remoção de filtro deve atualizar instantaneamente a listagem.
+
+[Nota: Exibir chips para barra de pesquisa]
+Em TableSearchInput também deve renderizar os chips dos filtros ativos expostos por useTableFilters (por exemplo, “Status: Pago ×”), enquanto o usuário digita.
+
+[Nota: Abas das opções criar, editar e visualizar]
+Ao criar, editar ou visualizar um reembolso será aberto um pop-up reutilizável (modal) com as abas: Dados, Sistema e Mensagens.
+
+[Nota: Aba Dados]
+Campos:
+
+Reembolso (texto) — obrigatório. (Ex.: “Táxi reunião cliente”, “Almoço viagem”)
+
+Valor (moeda) — obrigatório. (máscara monetária, duas casas decimais, ≥ 0)
+
+Descrição (textarea curta) — opcional.
+(Opcional, se desejar) Anexo/Comprovante (upload imagem/PDF; preview se imagem; nome/tamanho para PDF; permitir substituir/remover antes de salvar)
+Validações e UX (visuais):
+
+react-hook-form + Zod (UI); mensagens de erro claras; aria-invalid em campos inválidos.
+
+Foco de teclado, aria-label em inputs/botões; toasts e loaders ao salvar.
+
+Ao salvar, atualizar instantaneamente a listagem.
+
+[Nota: Ações do Formulário no Pop-up]
+Botões: “Salvar”, “Salvar e continuar” (mantém modal aberto) e “Cancelar”.
+
+Cancelar realiza dirty check com diálogo de confirmação antes de descartar alterações.
+
+Visualizar no modo leitura: exibir campos somente leitura e, se houver Anexo, preview (imagem) ou viewer/iframe (PDF).
+
+[Nota: Aba Sistema]
+Na aba "Sistema" exibir uma timeline técnica dinâmica com histórico do reembolso em ordem cronológica (mais recentes primeiro) dentro de um ScrollArea de 400px de altura. Cada evento deve ter:
+
+Coluna esquerda com ícone circular 40x40 (w-10 h-10) em bg-primary/10 e ícone lucide text-primary 20px (w-5 h-5), conectados por linha vertical cinza (bg-border) 1px que para no último item.
+
+Coluna direita com título do evento (font-semibold text-sm), metadados com micro-ícone UserRound (w-3.5 h-3.5) + usuário e CalendarClock + timestamp "dd/MM/yyyy 'às' HH:mm" (date-fns/ptBR), em text-xs text-muted-foreground, separados por border-b (exceto o último).
+Mapeamento de ícones: "created" → CirclePlus, "edited" → PencilLine, "marked" → Tag, "deleted" → Trash2, "restored" → RotateCcw.
+Interface TimelineEvent: id (string), type (union dos 5 tipos), user (string), timestamp (Date) e description (string). O componente Timeline recebe array de events, ordena por timestamp decrescente e renderiza cada TimelineItem passando a prop isLast.
+
+[Nota: Aba Mensagens]
+Na aba “Mensagens”, crie um sistema de chat colaborativo moderno usando React, TypeScript, Tailwind CSS e componentes Shadcn/UI com as seguintes especificações:
+
+ESTRUTURA DE COMPONENTES:
+
+Componente Principal (ChatColaborativo.tsx)
+Gerencia estado de mensagens e participantes
+Props: recordTitle (título do registro), recordId (ID do registro)
+Estado inicial com 4 participantes mockados com avatares do DiceBear
+Mensagens iniciais demonstrando funcionalidades de menção
+Layout: Container flex vertical sem scroll, distribuindo espaço entre título fixo, área de mensagens com scroll, e input fixo
+
+Lista de Mensagens (MessageList.tsx)
+ScrollArea com padding adequado
+Mensagens alinhadas à esquerda (outros) e direita (usuário atual)
+Cada mensagem contém:
+Avatar circular (40x40px)
+Nome do autor em negrito
+Timestamp formatado em português (Hoje às HH:mm, Ontem às HH:mm, ou DD/MM/YYYY às HH:mm)
+Bolha de mensagem com bordas arredondadas
+Conteúdo com suporte a menções destacadas
+Mensagens do usuário: fundo azul vibrante, texto branco
+Mensagens de outros: fundo cinza claro (muted), texto escuro
+Menções (@nome) destacadas com fundo semi-transparente da cor primary
+
+Input de Mensagens (MessageInput.tsx)
+Textarea expansível com altura mínima de 80px
+Placeholder: "Digite sua mensagem... Use @ para mencionar alguém"
+Botão de envio azul com ícone Send do Lucide
+Sistema de menções com @:
+Detecta @ digitado e abre popover de sugestões acima do input
+Filtra participantes conforme texto digitado após @
+Popover mostra avatar, nome e cargo
+Ao clicar, insere menção completa no texto
+Fecha automaticamente após seleção
+Hint: "Pressione Enter para enviar, Shift+Enter para nova linha"
+Validação de menções ao enviar (apenas usuários válidos)
+
+DESIGN SYSTEM (CSS Variables):
+
+--primary: 217 83% 58%; /* Azul vibrante para mensagens enviadas */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;  /* Cinza claro para mensagens recebidas */
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+[Nota: Regras]
+- Seguir o padrão do sistema
+- Usar os mesmos icones e cores
+- Seguir o mesmo padrão da sessão de filtros
+- Todos os filtros devem aparecer chips quando selecionado
+- Em todas as colunas da tabela deve aparecer o icone de ordenavel
+
+
+[Nota: Final]
