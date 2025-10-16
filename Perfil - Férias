@@ -1,0 +1,138 @@
+[Nota: Intranet - Módulo Perfil - Férias]
+
+[Nota: Onde]
+Dentro do item de menu chamado “Perfil”, crie um subitem chamado “Férias”. Ao clicar em “Férias”, abrir uma página chamada “Férias”, seguindo o padrão visual dos demais módulos utilizando shadcn/ui.
+
+[Nota: O que]
+Apresentar a tabela de listagem das férias do usuário com as colunas “Período”, “Referência”, “Status”, “Criado em” e “Ações”, todas ordenáveis; o título da coluna “Ações” deve ficar centralizado e alinhado visualmente entre os ícones e, na própria coluna, exibir diretamente os ícones de Visualizar, Editar e Excluir (sem menu de três pontos).
+A página deve exibir um botão “Solicitar Férias” (primário) acima da tabela.
+
+Período: mostrar De → Até (ex.: “05/02/2026 → 20/02/2026”).
+
+Referência:
+
+Quando real: “Férias de 05/02 a 20/02 — 16 dias”.
+
+Quando ainda não solicitado (estimativa): “Estimativa: a partir das últimas férias (15 dias sugeridos)”.
+
+Status (badge colorido): “Concluídas”, “Solicitação em Análise”, “Solicitação Negada”, “Aprovadas”, “Canceladas” (conforme necessário).
+
+Criado em: data/hora de abertura.
+
+Ações: ícones de Visualizar, Editar, Excluir (com aria-labels).
+
+[Nota: Ordenação]
+A ordenação deve usar o estado sort de useTableFilters, com ícone de ordenação ao lado do título da coluna, alternando entre crescente e decrescente ao clicar e atualizando o estado.
+
+[Nota: Filtros]
+Acima da tabela, incluir um container TableFilters controlado pelos hooks useTableFilters e useFilterOptions; dentro dele:
+
+TableSearchInput para busca geral (em observações, notas do período e referência) e filtro automático enquanto digita, sem botão de aplicar;
+
+TableFilterSelect para Status (Concluídas, Em Análise, Negada, Aprovadas, Canceladas) e Ano;
+
+DateRangePicker para Período de Férias;
+
+Chips dos filtros ativos (ex.: “Status: Em Análise ×”, “Ano: 2026 ×”, intervalo de datas), cada chip removível individualmente;
+
+Ação “Limpar tudo” integrada ao estado de useTableFilters; toda aplicação ou remoção de filtro deve atualizar instantaneamente a listagem.
+
+[Nota: Exibir chips para barra de pesquisa]
+Em TableSearchInput também deve renderizar os chips dos filtros ativos expostos por useTableFilters (por exemplo, “Status: Concluídas ×”, “Ano: 2025 ×”), enquanto o usuário digita.
+
+[Nota: Estilo visual da tabela]
+
+Linhas com hover sutil (bg-muted/50), cantos levemente arredondados.
+
+Badges de Status com cores consistentes e rótulo claro (não apenas cor).
+
+Período com mini-ícone Calendar e datas em destaque (font-medium).
+
+Referência em tom de text-muted-foreground, com ênfase no total de dias (negrito).
+
+[Nota: Abas das opções criar, editar e visualizar]
+Ao clicar em uma linha da tabela ou no botão “Solicitar Férias”, abrir um pop-up reutilizável (modal) com as abas: Dados, Sistema e Mensagens.
+
+[Nota: Aba Dados]
+Objetivo visual: formulário claro e compacto para registrar/editar a solicitação.
+Campos e elementos (UI):
+
+Período de Férias (DateRangePicker compacto) com preview “Total de dias” ao lado.
+
+Tipo de gozo: Radio pills “Integral” / “Parcelado” (se parcelado, renderizar cards por trecho com datas e subtotal).
+
+Referência/Estimativa (texto informativo): linha sutil exibindo “Estimativa a partir das últimas férias: 15 dias” quando aplicável.
+
+Observações (Textarea curta com contador).
+
+Resumo lateral (Card): Saldo atual, Dias selecionados, Indicativo visual (ícone) se o período cruza finais de semana/feriados (somente exibição).
+Acessibilidade/Feedback: campos com rótulos claros, aria-label, mensagens de erro ao lado do campo; toasts visuais ao salvar.
+
+[Nota: Ações do Formulário no Pop-up]
+Botões: “Salvar”, “Salvar e continuar” (mantém modal aberto) e “Cancelar”.
+
+Cancelar com dirty check (diálogo).
+
+Ao salvar, atualizar instantaneamente a tabela e exibir toast de sucesso/erro.
+
+[Nota: Aba Sistema]
+Na aba "Sistema" que exibe uma timeline técnica com histórico do registro em ordem cronológica (mais recentes primeiro) dentro de um ScrollArea de 400px. Cada evento deve ter:
+
+Coluna esquerda com ícone circular 40x40 (bg-primary/10) e ícone text-primary de 20px do lucide-react, conectados por linha vertical (bg-border) de 1px que para no último item.
+
+Coluna direita com título do evento (font-semibold text-sm), metadados com UserRound + usuário e CalendarClock + data "dd/MM/yyyy 'às' HH:mm" (date-fns/ptBR), tudo em text-xs text-muted-foreground, com border-b entre itens (exceto o último).
+Mapeamento de ícones: "created" → CirclePlus, "edited" → PencilLine, "marked" → Tag, "deleted" → Trash2, "restored" → RotateCcw (mesma cor/estilo).
+Interface TimelineEvent: id (string), type (union 5 tipos), user (string), timestamp (Date), description (string). O componente Timeline recebe array de events, ordena por timestamp decrescente e renderiza cada TimelineItem passando a prop isLast.
+
+[Nota: Aba Mensagens]
+Na aba “Mensagens”, crie um sistema de chat colaborativo moderno usando React, TypeScript, Tailwind CSS e componentes Shadcn/UI com as seguintes especificações:
+
+ESTRUTURA DE COMPONENTES:
+
+Componente Principal (ChatColaborativo.tsx)
+Gerencia estado de mensagens e participantes
+Props: recordTitle (título do registro), recordId (ID do registro)
+Estado inicial com 4 participantes mockados com avatares do DiceBear
+Mensagens iniciais demonstrando funcionalidades de menção
+Layout: Container flex vertical sem scroll, distribuindo espaço entre título fixo, área de mensagens com scroll, e input fixo
+
+Lista de Mensagens (MessageList.tsx)
+ScrollArea com padding adequado
+Mensagens alinhadas à esquerda (outros) e direita (usuário atual)
+Cada mensagem contém:
+Avatar circular (40x40px)
+Nome do autor em negrito
+Timestamp formatado em português (Hoje às HH:mm, Ontem às HH:mm, ou DD/MM/YYYY às HH:mm)
+Bolha de mensagem com bordas arredondadas
+Conteúdo com suporte a menções destacadas
+Mensagens do usuário: fundo azul vibrante, texto branco
+Mensagens de outros: fundo cinza claro (muted), texto escuro
+Menções (@nome) destacadas com fundo semi-transparente da cor primary
+
+Input de Mensagens (MessageInput.tsx)
+Textarea expansível com altura mínima de 80px
+Placeholder: "Digite sua mensagem... Use @ para mencionar alguém"
+Botão de envio azul com ícone Send do Lucide
+Sistema de menções com @:
+Detecta @ digitado e abre popover de sugestões acima do input
+Filtra participantes conforme texto digitado após @
+Popover mostra avatar, nome e cargo
+Ao clicar, insere menção completa no texto
+Fecha automaticamente após seleção
+Hint: "Pressione Enter para enviar, Shift+Enter para nova linha"
+Validação de menções ao enviar (apenas usuários válidos)
+
+DESIGN SYSTEM (CSS Variables):
+
+--primary: 217 83% 58%; /* Azul vibrante para mensagens enviadas */
+--primary-foreground: 0 0% 100%;
+--muted: 240 4.8% 95.9%;  /* Cinza claro para mensagens recebidas */
+--muted-foreground: 240 3.8% 46.1%;
+--border: 240 5.9% 90%;
+--radius: 0.75rem;
+
+[Nota: Regras]
+Siga o padrão visual do sistema, utilize as mesmas cores e icones, utilize o mesmo tamanho padrão para os modais e a mesma organização na tela.
+
+
+[Nota: Final]
