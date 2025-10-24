@@ -1,0 +1,14 @@
+Em /projetos, na aba de Mensagens, implemente a funcionalidade de menção a documentos utilizando o caractere #.
+Quando o usuário digitar #, o sistema deve exibir uma lista dos documentos salvos na aba “Documentos” do mesmo projeto, de forma semelhante ao comportamento atual das menções de usuários com @.
+
+A lista deve permitir:
+
+Busca dinâmica conforme o usuário digita após o “#”;
+
+Seleção de um documento clicando ou navegando com o teclado;
+
+Inserção automática do nome do documento no campo de mensagem;
+
+Renderização interativa da menção (por exemplo, com cor e sublinhado, permitindo abrir o documento ao clicar).
+
+O comportamento deve replicar a experiência das menções de pessoas, mas adaptado para documentos do projeto.
